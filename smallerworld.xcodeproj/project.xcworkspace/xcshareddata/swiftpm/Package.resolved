@@ -1,5 +1,5 @@
 {
-  "originHash" : "fab38b7d46bd664225e5eada1645f1d2bbf50fcf15d97dabb526eec1648d9fde",
+  "originHash" : "fae6df4c806fba466877c3de96127d0c4bd4c405419da25cb842c535124c7996",
   "pins" : [
     {
       "identity" : "bridge-components",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "595dba37c4918afd0e2d470109bc0c356d6e9afe",
         "version" : "1.2.2"
+      }
+    },
+    {
+      "identity" : "keychain-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/evgenyneu/keychain-swift.git",
+      "state" : {
+        "revision" : "5e1b02b6a9dac2a759a1d5dbc175c86bd192a608",
+        "version" : "24.0.0"
       }
     }
   ],
