@@ -3,7 +3,7 @@ import KeychainSwift
 import WebKit
 
 final class InstallationID {
-  static let current = InstallationID()
+  static let shared = InstallationID()
   private let cookie_name = "installation_id"
 
   //  private let keychain = KeychainSwift()
@@ -15,7 +15,7 @@ final class InstallationID {
   }
 
   func setCookie(webView: WKWebView) {
-    let components = URLComponents(url: AppDelegate.rootURL, resolvingAgainstBaseURL: false)!
+    let components = URLComponents(url: AppConstants.rootURL, resolvingAgainstBaseURL: true)!
     var properties: [HTTPCookiePropertyKey: Any] = [
       .name: cookie_name,
       .value: get(),

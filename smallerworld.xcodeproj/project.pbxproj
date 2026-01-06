@@ -10,10 +10,36 @@
 		2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */ = {isa = PBXBuildFile; productRef = 2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */; };
 		2A742A3F2EE7500B00F08F6E /* HotwireNative in Frameworks */ = {isa = PBXBuildFile; productRef = 2A742A3E2EE7500B00F08F6E /* HotwireNative */; };
 		2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABB78382F088EB000EC2451 /* KeychainSwift */; };
+		2ADF84662F0C10F000AE5037 /* notification-service.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2ADF845F2F0C10F000AE5037 /* notification-service.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2ADF84642F0C10F000AE5037 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2AC03BDD2EE74F0800D9CEAD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2ADF845E2F0C10F000AE5037;
+			remoteInfo = "notification-service";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2ADF846B2F0C10F000AE5037 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2ADF84662F0C10F000AE5037 /* notification-service.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2AC03BE52EE74F0800D9CEAD /* smallerworld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = smallerworld.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2ADF845F2F0C10F000AE5037 /* notification-service.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "notification-service.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -24,6 +50,20 @@
 			);
 			target = 2AC03BE42EE74F0800D9CEAD /* smallerworld */;
 		};
+		2ADF846A2F0C10F000AE5037 /* Exceptions for "notification-service" folder in "notification-service" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2ADF845E2F0C10F000AE5037 /* notification-service */;
+		};
+		2ADF84932F0CA49900AE5037 /* Exceptions for "smallerworld" folder in "notification-service" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppConstants.swift,
+			);
+			target = 2ADF845E2F0C10F000AE5037 /* notification-service */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -31,8 +71,17 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AC03BF72EE74F0A00D9CEAD /* Exceptions for "smallerworld" folder in "smallerworld" target */,
+				2ADF84932F0CA49900AE5037 /* Exceptions for "smallerworld" folder in "notification-service" target */,
 			);
 			path = smallerworld;
+			sourceTree = "<group>";
+		};
+		2ADF84602F0C10F000AE5037 /* notification-service */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2ADF846A2F0C10F000AE5037 /* Exceptions for "notification-service" folder in "notification-service" target */,
+			);
+			path = "notification-service";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -48,6 +97,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2ADF845C2F0C10F000AE5037 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -55,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				2AC03BE72EE74F0800D9CEAD /* smallerworld */,
+				2ADF84602F0C10F000AE5037 /* notification-service */,
 				2AC03BE62EE74F0800D9CEAD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				2AC03BE52EE74F0800D9CEAD /* smallerworld.app */,
+				2ADF845F2F0C10F000AE5037 /* notification-service.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -77,10 +135,12 @@
 				2AC03BE12EE74F0800D9CEAD /* Sources */,
 				2AC03BE22EE74F0800D9CEAD /* Frameworks */,
 				2AC03BE32EE74F0800D9CEAD /* Resources */,
+				2ADF846B2F0C10F000AE5037 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				2ADF84652F0C10F000AE5037 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2AC03BE72EE74F0800D9CEAD /* smallerworld */,
@@ -95,6 +155,28 @@
 			productReference = 2AC03BE52EE74F0800D9CEAD /* smallerworld.app */;
 			productType = "com.apple.product-type.application";
 		};
+		2ADF845E2F0C10F000AE5037 /* notification-service */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2ADF84672F0C10F000AE5037 /* Build configuration list for PBXNativeTarget "notification-service" */;
+			buildPhases = (
+				2ADF845B2F0C10F000AE5037 /* Sources */,
+				2ADF845C2F0C10F000AE5037 /* Frameworks */,
+				2ADF845D2F0C10F000AE5037 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2ADF84602F0C10F000AE5037 /* notification-service */,
+			);
+			name = "notification-service";
+			packageProductDependencies = (
+			);
+			productName = "notification-service";
+			productReference = 2ADF845F2F0C10F000AE5037 /* notification-service.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -102,11 +184,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2610;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					2AC03BE42EE74F0800D9CEAD = {
 						CreatedOnToolsVersion = 26.1.1;
+					};
+					2ADF845E2F0C10F000AE5037 = {
+						CreatedOnToolsVersion = 26.2;
 					};
 				};
 			};
@@ -130,12 +215,20 @@
 			projectRoot = "";
 			targets = (
 				2AC03BE42EE74F0800D9CEAD /* smallerworld */,
+				2ADF845E2F0C10F000AE5037 /* notification-service */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2AC03BE32EE74F0800D9CEAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2ADF845D2F0C10F000AE5037 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -152,7 +245,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2ADF845B2F0C10F000AE5037 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2ADF84652F0C10F000AE5037 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2ADF845E2F0C10F000AE5037 /* notification-service */;
+			targetProxy = 2ADF84642F0C10F000AE5037 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2AC03BF92EE74F0A00D9CEAD /* Debug */ = {
@@ -358,6 +466,64 @@
 			};
 			name = Release;
 		};
+		2ADF84682F0C10F000AE5037 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = UB3SB3746X;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "notification-service/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "notification-service";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "club.smallerworld.ios.notification-service";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2ADF84692F0C10F000AE5037 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = UB3SB3746X;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "notification-service/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "notification-service";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "club.smallerworld.ios.notification-service";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -375,6 +541,15 @@
 			buildConfigurations = (
 				2AC03BF92EE74F0A00D9CEAD /* Debug */,
 				2AC03BFA2EE74F0A00D9CEAD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2ADF84672F0C10F000AE5037 /* Build configuration list for PBXNativeTarget "notification-service" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2ADF84682F0C10F000AE5037 /* Debug */,
+				2ADF84692F0C10F000AE5037 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
