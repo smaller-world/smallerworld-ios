@@ -6,11 +6,13 @@ import os.log
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCenterDelegate {
   var window: UIWindow?
 
+  private let navigatorDelegate = SceneNavigatorDelegate()
   private let navigator = Navigator(
     configuration: .init(
       name: "main",
       startLocation: AppConstants.rootURL,
-    ))
+    ),
+  )
 
   // Triggers from a cold start
   func scene(
@@ -19,16 +21,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCente
   ) {
     UNUserNotificationCenter.current().delegate = self
     window?.rootViewController = navigator.rootViewController
+    navigator.delegate = navigatorDelegate
+    navigator.start()
 
     if let userActivity = connectionOptions.userActivities.first,
       userActivity.activityType == NSUserActivityTypeBrowsingWeb,
       let incomingURL = userActivity.webpageURL
     {
-      navigator.route(incomingURL)
+      deepRouteTo(incomingURL)
     } else if let response = connectionOptions.notificationResponse {
       handleNotificationTap(response.notification)
-    } else {
-      navigator.start()
     }
 
     // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -100,7 +102,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCente
 
   // MARK: Helpers
 
-  private func subroutes(_ url: URL) -> [URL] {
+  private func subRoutes(_ url: URL) -> [URL] {
     var pathComponents = url.pathComponents
     pathComponents.removeFirst()
     pathComponents.removeLast()
@@ -122,46 +124,57 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCente
 
   private func handleNotificationTap(_ notification: UNNotification) {
     log("handleNotificationTap", ["notification": notification])
-
     let userInfo = notification.request.content.userInfo
     guard let targetString = userInfo["target_url"] as? String else { return }
     guard let targetUrl = URL(string: targetString, relativeTo: AppConstants.baseURL) else {
       return
     }
+    deepRouteTo(targetUrl)
+  }
 
-    if let activeUrl = navigator.activeWebView.url, activeUrl.path() == targetUrl.path() {
-      logger.debug("Replacing active controller")
-      // Currently on target route
-      if activeUrl.query() != targetUrl.query() {
-        navigator.route(targetUrl, options: VisitOptions(action: .replace))
+  private func deepRouteTo(_ url: URL) {
+    log("deepRouteTo", ["url": url])
+    Task { await deepRouteToAsync(url) }
+  }
+
+  @MainActor
+  private func deepRouteToAsync(_ url: URL) async {
+    // Wait for current navigation
+    let isInitiallyNavigating = navigatorDelegate.isNavigating
+    if isInitiallyNavigating {
+      let navigationSucceeded = await navigatorDelegate.waitForCurrentRequestToFinish();
+      if !navigationSucceeded {
+        return
       }
-    } else {
-      logger.debug("Clearing controllers and routing from root")
-      // Target route is not active route
-      navigator.clearAll(animated: true)
-      for url in subroutes(targetUrl) {
-        logger.debug("Routing to (sub)route: \(url)")
+    }
+   
+    // If already on route, simply replace it
+    if let activeUrl = navigator.activeWebView.url, url.path() == activeUrl.path() {
+      if !isInitiallyNavigating || activeUrl.query() != url.query() {
+        logger.debug("Replacing top-level controller with new route")
+        navigator.route(url, options: VisitOptions(action: .replace))
+      } else {
+        logger.debug("Already navigated to desired URL")
+      }
+      return
+    }
+   
+    // Otherwise clear all controllers and route from root
+    logger.debug("Clearing controllers and routing from root")
+    navigator.clearAll()
+    for url in subRoutes(url) {
+      logger.debug("Routing to (sub)route: \(url)")
+      let navigationSucceeded = await navigatorDelegate.waitForCurrentRequestToFinish()
+      if !navigationSucceeded {
+        return
+      }
+      if let activeUrl = navigator.activeWebView.url, activeUrl.path() != url.path() {
         navigator.route(url)
       }
     }
   }
-
+  
   private func log(_ name: String, _ arguments: [String: Any] = [:]) {
     logger.debug("[SceneDelegate] \(name) \(arguments)")
   }
-
-  // private func replaceOrRoute(_ url: URL) {
-  //   if let currentUrl = navigator.activeWebView.url, currentUrl.path() == url.path() {
-  //     if currentUrl.query() != url.query() {
-  //       print("Replacing root view with: \(url)")
-  //       navigator.route(url, options: VisitOptions(action: .replace))
-  //     }
-  //   } else {
-  //     navigator.route(url)
-  //   }
-  // }
 }
-
-//extension SceneDelegate: VisitableDelegate {
-//    visidid
-//}
