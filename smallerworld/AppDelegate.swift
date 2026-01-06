@@ -3,17 +3,12 @@ import HotwireNative
 import UIKit
 import UserNotifications
 import WebKit
+import os.log
+
+let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "smallerworld")
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-  #if DEBUG
-    static let rootURL = URL(string: "https://kaibook.itskai.me/start/app")!
-  #else
-    static let rootURL = URL(string: "https://smallerworld.club/start/app")!
-  #endif
-  let pathConfigurationUrl = URL(
-    string: "https://smallerworld.club/path_configurations/ios_v1.json")!
-
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -36,9 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(
     _ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error
   ) {
-    print("Failed to register for remote notifications: \(error)")
+    logger.error("Failed to register for remote notifications: \(error)")
   }
-  // let pathConfigurationUrl = URL(string: "https://37c16de776fd.ngrok-free.app/path_configurations/ios_v1.json")!
 
   // MARK: UISceneSession Lifecycle
 
@@ -75,7 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // For background videos
       configuration.allowsInlineMediaPlayback = true
       let webView = WKWebView(frame: .zero, configuration: configuration)
-      InstallationID.current.setCookie(webView: webView)
+      InstallationID.shared.setCookie(webView: webView)
       #if DEBUG
         webView.isInspectable = true
       #endif
@@ -90,7 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // == Path configuration
     Hotwire.config.pathConfiguration.matchQueryStrings = false
-    Hotwire.loadPathConfiguration(from: [.server(pathConfigurationUrl)])
+    Hotwire.loadPathConfiguration(from: [.server(AppConstants.pathConfigurationURL)])
 
     // == Debugging
     #if DEBUG
