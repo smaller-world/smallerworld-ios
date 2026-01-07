@@ -11,10 +11,10 @@ final class InstallationID {
   private init() {}
 
   func get() -> String {
-    UIDevice.current.identifierForVendor!.uuidString
+    UIDevice.current.identifierForVendor?.uuidString ?? ""
   }
 
-  func setCookie(webView: WKWebView) {
+  func setDefaultCookie(completionHandler: (() -> Void)? = nil) {
     let components = URLComponents(url: AppConstants.rootURL, resolvingAgainstBaseURL: true)!
     var properties: [HTTPCookiePropertyKey: Any] = [
       .name: cookie_name,
@@ -27,6 +27,6 @@ final class InstallationID {
       properties[.port] = port
     }
     let cookie = HTTPCookie(properties: properties)!
-    webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+    WKWebsiteDataStore.default().httpCookieStore.setCookie(cookie, completionHandler: completionHandler)
   }
 }

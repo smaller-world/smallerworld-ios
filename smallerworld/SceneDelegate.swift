@@ -20,17 +20,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCente
     options connectionOptions: UIScene.ConnectionOptions
   ) {
     UNUserNotificationCenter.current().delegate = self
-    window?.rootViewController = navigator.rootViewController
     navigator.delegate = navigatorDelegate
-    navigator.start()
-
-    if let userActivity = connectionOptions.userActivities.first,
-      userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-      let incomingURL = userActivity.webpageURL
-    {
-      deepRouteTo(incomingURL)
-    } else if let response = connectionOptions.notificationResponse {
-      handleNotificationTap(response.notification)
+    window?.rootViewController = navigator.rootViewController
+    InstallationID.shared.setDefaultCookie { [weak self] in
+      guard let self else { return }
+      DispatchQueue.main.async {
+        self.navigator.start()
+        if let userActivity = connectionOptions.userActivities.first,
+          userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+          let incomingURL = userActivity.webpageURL
+        {
+          self.deepRouteTo(incomingURL)
+        } else if let response = connectionOptions.notificationResponse {
+          self.handleNotificationTap(response.notification)
+        }
+      }
     }
 
     // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
