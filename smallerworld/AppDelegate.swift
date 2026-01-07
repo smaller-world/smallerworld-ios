@@ -69,7 +69,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // For background videos
       configuration.allowsInlineMediaPlayback = true
       let webView = WKWebView(frame: .zero, configuration: configuration)
-      InstallationID.shared.setCookie(webView: webView)
       #if DEBUG
         webView.isInspectable = true
       #endif
