@@ -10,7 +10,7 @@
 		2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */ = {isa = PBXBuildFile; productRef = 2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */; };
 		2A742A3F2EE7500B00F08F6E /* HotwireNative in Frameworks */ = {isa = PBXBuildFile; productRef = 2A742A3E2EE7500B00F08F6E /* HotwireNative */; };
 		2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABB78382F088EB000EC2451 /* KeychainSwift */; };
-		2ADF84662F0C10F000AE5037 /* notification-service.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2ADF845F2F0C10F000AE5037 /* notification-service.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2ADF84662F0C10F000AE5037 /* smallerworld notification service.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +30,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				2ADF84662F0C10F000AE5037 /* notification-service.appex in Embed Foundation Extensions */,
+				2ADF84662F0C10F000AE5037 /* smallerworld notification service.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -39,7 +39,7 @@
 
 /* Begin PBXFileReference section */
 		2AC03BE52EE74F0800D9CEAD /* smallerworld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = smallerworld.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2ADF845F2F0C10F000AE5037 /* notification-service.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "notification-service.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "smallerworld notification service.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -50,19 +50,19 @@
 			);
 			target = 2AC03BE42EE74F0800D9CEAD /* smallerworld */;
 		};
-		2ADF846A2F0C10F000AE5037 /* Exceptions for "notification-service" folder in "notification-service" target */ = {
+		2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworld notification service" folder in "smallerworld notification service" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 2ADF845E2F0C10F000AE5037 /* notification-service */;
+			target = 2ADF845E2F0C10F000AE5037 /* smallerworld notification service */;
 		};
-		2ADF84932F0CA49900AE5037 /* Exceptions for "smallerworld" folder in "notification-service" target */ = {
+		2ADF84932F0CA49900AE5037 /* Exceptions for "smallerworld" folder in "smallerworld notification service" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppConstants.swift,
 			);
-			target = 2ADF845E2F0C10F000AE5037 /* notification-service */;
+			target = 2ADF845E2F0C10F000AE5037 /* smallerworld notification service */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -71,17 +71,17 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AC03BF72EE74F0A00D9CEAD /* Exceptions for "smallerworld" folder in "smallerworld" target */,
-				2ADF84932F0CA49900AE5037 /* Exceptions for "smallerworld" folder in "notification-service" target */,
+				2ADF84932F0CA49900AE5037 /* Exceptions for "smallerworld" folder in "smallerworld notification service" target */,
 			);
 			path = smallerworld;
 			sourceTree = "<group>";
 		};
-		2ADF84602F0C10F000AE5037 /* notification-service */ = {
+		2ADF84602F0C10F000AE5037 /* smallerworld notification service */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2ADF846A2F0C10F000AE5037 /* Exceptions for "notification-service" folder in "notification-service" target */,
+				2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworld notification service" folder in "smallerworld notification service" target */,
 			);
-			path = "notification-service";
+			path = "smallerworld notification service";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -111,7 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				2AC03BE72EE74F0800D9CEAD /* smallerworld */,
-				2ADF84602F0C10F000AE5037 /* notification-service */,
+				2ADF84602F0C10F000AE5037 /* smallerworld notification service */,
 				2AC03BE62EE74F0800D9CEAD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -120,7 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				2AC03BE52EE74F0800D9CEAD /* smallerworld.app */,
-				2ADF845F2F0C10F000AE5037 /* notification-service.appex */,
+				2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,9 +155,9 @@
 			productReference = 2AC03BE52EE74F0800D9CEAD /* smallerworld.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2ADF845E2F0C10F000AE5037 /* notification-service */ = {
+		2ADF845E2F0C10F000AE5037 /* smallerworld notification service */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2ADF84672F0C10F000AE5037 /* Build configuration list for PBXNativeTarget "notification-service" */;
+			buildConfigurationList = 2ADF84672F0C10F000AE5037 /* Build configuration list for PBXNativeTarget "smallerworld notification service" */;
 			buildPhases = (
 				2ADF845B2F0C10F000AE5037 /* Sources */,
 				2ADF845C2F0C10F000AE5037 /* Frameworks */,
@@ -168,13 +168,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				2ADF84602F0C10F000AE5037 /* notification-service */,
+				2ADF84602F0C10F000AE5037 /* smallerworld notification service */,
 			);
-			name = "notification-service";
+			name = "smallerworld notification service";
 			packageProductDependencies = (
 			);
 			productName = "notification-service";
-			productReference = 2ADF845F2F0C10F000AE5037 /* notification-service.appex */;
+			productReference = 2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -215,7 +215,7 @@
 			projectRoot = "";
 			targets = (
 				2AC03BE42EE74F0800D9CEAD /* smallerworld */,
-				2ADF845E2F0C10F000AE5037 /* notification-service */,
+				2ADF845E2F0C10F000AE5037 /* smallerworld notification service */,
 			);
 		};
 /* End PBXProject section */
@@ -257,7 +257,7 @@
 /* Begin PBXTargetDependency section */
 		2ADF84652F0C10F000AE5037 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2ADF845E2F0C10F000AE5037 /* notification-service */;
+			target = 2ADF845E2F0C10F000AE5037 /* smallerworld notification service */;
 			targetProxy = 2ADF84642F0C10F000AE5037 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -473,8 +473,8 @@
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "notification-service/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "notification-service";
+				INFOPLIST_FILE = "smallerworld notification service/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "smallerworld notification service";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -483,7 +483,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 0.4;
-				PRODUCT_BUNDLE_IDENTIFIER = "club.smallerworld.ios.notification-service";
+				PRODUCT_BUNDLE_IDENTIFIER = club.smallerworld.ios.notificationservice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -502,8 +502,8 @@
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "notification-service/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "notification-service";
+				INFOPLIST_FILE = "smallerworld notification service/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "smallerworld notification service";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -512,7 +512,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 0.4;
-				PRODUCT_BUNDLE_IDENTIFIER = "club.smallerworld.ios.notification-service";
+				PRODUCT_BUNDLE_IDENTIFIER = club.smallerworld.ios.notificationservice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -545,7 +545,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2ADF84672F0C10F000AE5037 /* Build configuration list for PBXNativeTarget "notification-service" */ = {
+		2ADF84672F0C10F000AE5037 /* Build configuration list for PBXNativeTarget "smallerworld notification service" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2ADF84682F0C10F000AE5037 /* Debug */,
