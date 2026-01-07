@@ -1,0 +1,25 @@
+{
+  "settings": {},
+  "rules": [
+    {
+      "patterns": [".*"],
+      "properties": {
+        "context": "default",
+        "pull_to_refresh_enabled": true
+      }
+    },
+    {
+      "patterns": ["^/spaces$"],
+      "properties": {
+        "presentation": "replace_root"
+      }
+    },
+    {
+      "patterns": ["^/login$", "^/settings$", "/new$", "/edit$"],
+      "properties": {
+        "context": "modal",
+        "pull_to_refresh_enabled": false
+      }
+    }
+  ]
+}

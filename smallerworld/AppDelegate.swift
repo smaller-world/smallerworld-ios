@@ -84,7 +84,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // == Path configuration
     Hotwire.config.pathConfiguration.matchQueryStrings = false
-    Hotwire.loadPathConfiguration(from: [.server(AppConstants.pathConfigurationURL)])
+    Hotwire.loadPathConfiguration(from: [
+      .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!),
+      .server(AppConstants.pathConfigurationURL),
+    ])
 
     // == Debugging
     #if DEBUG
