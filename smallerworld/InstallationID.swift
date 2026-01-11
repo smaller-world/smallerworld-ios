@@ -1,6 +1,7 @@
 import Foundation
 import KeychainSwift
 import WebKit
+import os
 
 final class InstallationID {
   static let shared = InstallationID()
@@ -21,10 +22,12 @@ final class InstallationID {
   }
 
   func setDefaultCookie() async {
+    let installation_id = await get();
+    log("setDefaultCookie", ["installation_id": installation_id])
     let components = URLComponents(url: AppConstants.rootURL, resolvingAgainstBaseURL: true)!
     var properties: [HTTPCookiePropertyKey: Any] = [
       .name: cookie_name,
-      .value: await get(),
+      .value: installation_id,
       .domain: components.host!,
       .path: "/",  // A path of "/" makes it available to all paths on the domain
       .secure: components.scheme == "https",
@@ -38,5 +41,9 @@ final class InstallationID {
         continuation.resume()
       }
     }
+  }
+  
+  private func log(_ name: String, _ arguments: [String: Any] = [:]) {
+    logger.debug("[InstallationID] \(name) \(arguments)")
   }
 }
