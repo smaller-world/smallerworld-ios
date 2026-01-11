@@ -22,9 +22,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCente
     UNUserNotificationCenter.current().delegate = self
     navigator.delegate = navigatorDelegate
     window?.rootViewController = navigator.rootViewController
-    InstallationID.shared.setDefaultCookie { [weak self] in
+    Task { [weak self] in
       guard let self else { return }
-      DispatchQueue.main.async {
+      await InstallationID.shared.setDefaultCookie()
+      await MainActor.run {
         self.navigator.start()
         if let userActivity = connectionOptions.userActivities.first,
           userActivity.activityType == NSUserActivityTypeBrowsingWeb,
