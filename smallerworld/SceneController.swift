@@ -3,24 +3,30 @@ import UIKit
 import WebKit
 import os.log
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCenterDelegate {
+class SceneController: UIResponder {
   var window: UIWindow?
 
-  private let navigatorDelegate = SceneNavigatorDelegate()
+  private let navigationTracker = NavigationTracker()
   private let navigator = Navigator(
     configuration: .init(
       name: "main",
-      startLocation: AppConstants.rootURL,
+      startLocation: SmallerWorld.rootURL,
     ),
   )
 
+  private func log(_ name: String, _ arguments: [String: Any] = [:]) {
+    logger.debug("[SceneController] \(name) \(arguments)")
+  }
+}
+
+extension SceneController: UIWindowSceneDelegate {
   // Triggers from a cold start
   func scene(
     _ scene: UIScene, willConnectTo session: UISceneSession,
     options connectionOptions: UIScene.ConnectionOptions
   ) {
     UNUserNotificationCenter.current().delegate = self
-    navigator.delegate = navigatorDelegate
+    navigator.delegate = self
     window?.rootViewController = navigator.rootViewController
     Task { [weak self] in
       guard let self else { return }
@@ -83,8 +89,91 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCente
     // to restore the scene back to its current state.
   }
 
-  // MARK: UNUserNotificationCenterDelegate
+  // MARK: Helpers
 
+  private func subRoutes(_ url: URL) -> [URL] {
+    var pathComponents = url.pathComponents
+    pathComponents.removeFirst()
+    pathComponents.removeLast()
+    guard !pathComponents.isEmpty else { return [url] }
+
+    var result: [URL] = []
+    var currentPath = ""
+
+    for component in pathComponents {
+      currentPath += "/" + component
+      if let subroute = URL(string: currentPath, relativeTo: SmallerWorld.baseURL) {
+        result.append(subroute)
+      }
+    }
+    result.append(url)
+
+    return result
+  }
+
+  private func deepRouteTo(_ url: URL) {
+    log("deepRouteTo", ["url": url])
+    Task { await deepRouteToAsync(url) }
+  }
+
+  @MainActor
+  private func deepRouteToAsync(_ url: URL) async {
+    // Wait for current navigation
+    let isInitiallyNavigating = navigationTracker.isNavigating
+    if isInitiallyNavigating {
+      let navigationSucceeded = await navigationTracker.waitForCurrentRequestToFinish()
+      if !navigationSucceeded {
+        return
+      }
+    }
+
+    // If already on route, simply replace it
+    if let activeUrl = navigator.activeWebView.url, url.path() == activeUrl.path() {
+      if !isInitiallyNavigating || activeUrl.query() != url.query() {
+        logger.debug("Replacing top-level controller with new route")
+        navigator.route(url, options: VisitOptions(action: .replace))
+      } else {
+        logger.debug("Already navigated to desired URL")
+      }
+      return
+    }
+
+    // Otherwise clear all controllers and route from root
+    logger.debug("Clearing controllers and routing from root")
+    navigator.clearAll()
+    for url in subRoutes(url) {
+      logger.debug("Routing to (sub)route: \(url)")
+      let navigationSucceeded = await navigationTracker.waitForCurrentRequestToFinish()
+      if !navigationSucceeded {
+        return
+      }
+      if let activeUrl = navigator.activeWebView.url, activeUrl.path() != url.path() {
+        navigator.route(url)
+      }
+    }
+  }
+}
+
+extension SceneController: NavigatorDelegate {
+  func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
+    navigationTracker.visitStarted()
+    return .accept
+  }
+
+  func requestDidFinish(at url: URL) {
+    navigationTracker.visitEnded()
+  }
+
+  func visitableDidFailRequest(
+    _ visitable: Visitable,
+    error: Error,
+    retryHandler: @escaping RetryBlock
+  ) {
+    navigationTracker.visitEnded(success: false)
+  }
+}
+
+extension SceneController: UNUserNotificationCenterDelegate {
   // Show notifications even when app is in foreground
   func userNotificationCenter(
     _ center: UNUserNotificationCenter,
@@ -107,79 +196,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UNUserNotificationCente
 
   // MARK: Helpers
 
-  private func subRoutes(_ url: URL) -> [URL] {
-    var pathComponents = url.pathComponents
-    pathComponents.removeFirst()
-    pathComponents.removeLast()
-    guard !pathComponents.isEmpty else { return [url] }
-
-    var result: [URL] = []
-    var currentPath = ""
-
-    for component in pathComponents {
-      currentPath += "/" + component
-      if let subroute = URL(string: currentPath, relativeTo: AppConstants.baseURL) {
-        result.append(subroute)
-      }
-    }
-    result.append(url)
-
-    return result
-  }
-
   private func handleNotificationTap(_ notification: UNNotification) {
     log("handleNotificationTap", ["notification": notification])
     let userInfo = notification.request.content.userInfo
     guard let targetString = userInfo["target_url"] as? String else { return }
-    guard let targetUrl = URL(string: targetString, relativeTo: AppConstants.baseURL) else {
+    guard let targetUrl = URL(string: targetString, relativeTo: SmallerWorld.baseURL) else {
       return
     }
     deepRouteTo(targetUrl)
-  }
-
-  private func deepRouteTo(_ url: URL) {
-    log("deepRouteTo", ["url": url])
-    Task { await deepRouteToAsync(url) }
-  }
-
-  @MainActor
-  private func deepRouteToAsync(_ url: URL) async {
-    // Wait for current navigation
-    let isInitiallyNavigating = navigatorDelegate.isNavigating
-    if isInitiallyNavigating {
-      let navigationSucceeded = await navigatorDelegate.waitForCurrentRequestToFinish();
-      if !navigationSucceeded {
-        return
-      }
-    }
-   
-    // If already on route, simply replace it
-    if let activeUrl = navigator.activeWebView.url, url.path() == activeUrl.path() {
-      if !isInitiallyNavigating || activeUrl.query() != url.query() {
-        logger.debug("Replacing top-level controller with new route")
-        navigator.route(url, options: VisitOptions(action: .replace))
-      } else {
-        logger.debug("Already navigated to desired URL")
-      }
-      return
-    }
-   
-    // Otherwise clear all controllers and route from root
-    logger.debug("Clearing controllers and routing from root")
-    navigator.clearAll()
-    for url in subRoutes(url) {
-      logger.debug("Routing to (sub)route: \(url)")
-      let navigationSucceeded = await navigatorDelegate.waitForCurrentRequestToFinish()
-      if !navigationSucceeded {
-        return
-      }
-      if let activeUrl = navigator.activeWebView.url, activeUrl.path() != url.path() {
-        navigator.route(url)
-      }
-    }
-  }
-  
-  private func log(_ name: String, _ arguments: [String: Any] = [:]) {
-    logger.debug("[SceneDelegate] \(name) \(arguments)")
   }
 }

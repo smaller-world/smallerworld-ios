@@ -17,7 +17,7 @@ class NotificationService: UNNotificationServiceExtension {
     // communication intent).
     guard
       let iconUrlString = content.userInfo["icon_url"] as? String,
-      let iconUrl = URL(string: iconUrlString, relativeTo: AppConstants.baseURL)
+      let iconUrl = URL(string: iconUrlString, relativeTo: SmallerWorld.baseURL)
     else {
       contentHandler(content)
       return

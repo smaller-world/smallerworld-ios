@@ -60,7 +60,7 @@
 		2ADF84932F0CA49900AE5037 /* Exceptions for "smallerworld" folder in "smallerworld notification service" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AppConstants.swift,
+				SmallerWorld.swift,
 			);
 			target = 2ADF845E2F0C10F000AE5037 /* smallerworld notification service */;
 		};
