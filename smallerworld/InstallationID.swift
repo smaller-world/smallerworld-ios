@@ -22,9 +22,9 @@ final class InstallationID {
   }
 
   func setDefaultCookie() async {
-    let installation_id = await get();
+    let installation_id = await get()
     log("setDefaultCookie", ["installation_id": installation_id])
-    let components = URLComponents(url: AppConstants.rootURL, resolvingAgainstBaseURL: true)!
+    let components = URLComponents(url: SmallerWorld.rootURL, resolvingAgainstBaseURL: true)!
     var properties: [HTTPCookiePropertyKey: Any] = [
       .name: cookie_name,
       .value: installation_id,
@@ -42,7 +42,7 @@ final class InstallationID {
       }
     }
   }
-  
+
   private func log(_ name: String, _ arguments: [String: Any] = [:]) {
     logger.debug("[InstallationID] \(name) \(arguments)")
   }

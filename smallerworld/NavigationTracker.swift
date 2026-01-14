@@ -1,8 +1,6 @@
-import HotwireNative
 import Foundation
-
 @MainActor
-final class SceneNavigatorDelegate: NSObject, NavigatorDelegate {
+final class NavigationTracker {
   public private(set) var isNavigating = false
   private var waiters: [CheckedContinuation<Bool, Never>] = []
 
@@ -15,24 +13,11 @@ final class SceneNavigatorDelegate: NSObject, NavigatorDelegate {
     }
   }
 
-  func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
+  func visitStarted() {
     isNavigating = true
-    return .accept
   }
 
-  func requestDidFinish(at url: URL) {
-    resolve(success: true)
-  }
-
-  func visitableDidFailRequest(
-    _ visitable: Visitable,
-    error: Error,
-    retryHandler: @escaping RetryBlock
-  ) {
-    resolve(success: false)
-  }
-
-  private func resolve(success: Bool) {
+  func visitEnded(success: Bool = true) {
     isNavigating = false
     let continuations = waiters
     waiters.removeAll()

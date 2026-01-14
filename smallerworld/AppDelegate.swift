@@ -43,7 +43,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Called when a new scene session is being created.
     // Use this method to select a configuration to create the new scene with.
     return UISceneConfiguration(
-      name: "Default Configuration", sessionRole: connectingSceneSession.role)
+      name: "Default Configuration",
+      sessionRole: connectingSceneSession.role
+    )
   }
 
   func application(
@@ -54,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
   }
 
-  // == Helpers ==
+  // MARK: Helpers
 
   private func configureAppearance() {
     //        let navbar = UINavigationBar.appearance()
@@ -85,7 +87,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Hotwire.config.pathConfiguration.matchQueryStrings = false
     Hotwire.loadPathConfiguration(from: [
       .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!),
-      .server(AppConstants.pathConfigurationURL),
+      .server(SmallerWorld.pathConfigurationURL),
     ])
 
     // == Debugging

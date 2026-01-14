@@ -1,6 +1,6 @@
 import Foundation
 
-struct AppConstants {
+struct SmallerWorld {
   #if DEBUG
     static let domain = "kaibook.itskai.me"
   #else
