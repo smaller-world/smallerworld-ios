@@ -1,6 +1,6 @@
 import UIKit
 
-final class GradientOverlayView: UIView {
+final class ModalTopDecorationView: UIView {
   override class var layerClass: AnyClass { CAGradientLayer.self }
 
   // A subtle "rim light" layer to define the top edge
@@ -16,7 +16,7 @@ final class GradientOverlayView: UIView {
 
   @available(
     *, unavailable,
-    message: "Use init(frame:) instead; GradientOverlayView is not nib/storyboard-backed."
+    message: "Use init(frame:) instead; ModalTopDecorationView is not nib/storyboard-backed."
   )
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
