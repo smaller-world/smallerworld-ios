@@ -3,7 +3,7 @@ import UIKit
 import WebKit
 
 open class WebViewController: HotwireWebViewController {
-  private let topGradient = GradientOverlayView()
+  private let topDecoration = ModalTopDecorationView()
 
   open override func viewDidLoad() {
     super.viewDidLoad()
@@ -11,13 +11,13 @@ open class WebViewController: HotwireWebViewController {
       view.backgroundColor = color
     }
 
-    view.addSubview(topGradient)
-    topGradient.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(topDecoration)
+    topDecoration.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      topGradient.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      topGradient.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      topGradient.topAnchor.constraint(equalTo: view.topAnchor),
-      topGradient.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      topDecoration.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      topDecoration.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      topDecoration.topAnchor.constraint(equalTo: view.topAnchor),
+      topDecoration.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
     ])
   }
 
@@ -26,7 +26,7 @@ open class WebViewController: HotwireWebViewController {
 
     let isModal =
       presentingViewController != nil || navigationController?.presentingViewController != nil
-    topGradient.isHidden = !isModal
+    topDecoration.isHidden = !isModal
   }
 
   //    open override func visitableDidRender() {
