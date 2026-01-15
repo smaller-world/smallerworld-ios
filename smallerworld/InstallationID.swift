@@ -24,7 +24,7 @@ final class InstallationID {
   func setDefaultCookie() async {
     let installation_id = await get()
     log("setDefaultCookie", ["installation_id": installation_id])
-    let components = URLComponents(url: SmallerWorld.rootURL, resolvingAgainstBaseURL: true)!
+    let components = URLComponents(url: SmallerWorld.baseURL, resolvingAgainstBaseURL: true)!
     var properties: [HTTPCookiePropertyKey: Any] = [
       .name: cookie_name,
       .value: installation_id,
