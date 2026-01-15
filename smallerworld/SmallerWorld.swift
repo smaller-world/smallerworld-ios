@@ -8,7 +8,6 @@ struct SmallerWorld {
   #endif
 
   static let baseURL = URL(string: "https://\(domain)")!
-  static let rootURL = URL(string: "/start/app", relativeTo: baseURL)!
   static let pathConfigurationURL = URL(
     string: "/path_configurations/ios_v1.json",
     relativeTo: baseURL

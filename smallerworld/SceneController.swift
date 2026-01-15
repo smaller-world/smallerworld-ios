@@ -6,16 +6,51 @@ import os.log
 class SceneController: UIResponder {
   var window: UIWindow?
 
-  private let navigationTracker = NavigationTracker()
-  private let navigator = Navigator(
-    configuration: .init(
-      name: "main",
-      startLocation: SmallerWorld.rootURL,
-    ),
-  )
+  private var navigationTrackers: [String: NavigationTracker] = [:]
+  private lazy var tabBarController = HotwireTabBarController(navigatorDelegate: self)
 
   private func log(_ name: String, _ arguments: [String: Any] = [:]) {
     logger.debug("[SceneController] \(name) \(arguments)")
+  }
+
+  private func navigationTracker(for tab: HotwireTab) -> NavigationTracker {
+    if let existing = navigationTrackers[tab.url.path()] {
+      return existing
+    }
+    let tracker = NavigationTracker(name: tab.url.path())
+    navigationTrackers[tab.url.path()] = tracker
+    if navigationTrackers.count > HotwireTab.all.count {
+      fatalError("Navigation tracker count exceeds configured tabs.")
+    }
+    return tracker
+  }
+
+  private func switchToTab(_ tab: HotwireTab) {
+    if let index = HotwireTab.all.firstIndex(of: tab) {
+      tabBarController.selectedIndex = index
+    }
+  }
+
+  private func currentTab() -> HotwireTab {
+    HotwireTab.all[tabBarController.selectedIndex]
+  }
+
+  private func promptForAuthentication() {
+    let authURL = SmallerWorld.baseURL.appendingPathComponent("/login")
+    tabBarController.activeNavigator.route(authURL)
+  }
+
+  private func configureAppearance() {
+    let label = UILabel.appearance()
+    label.font = .appBody()
+    label.adjustsFontForContentSizeCategory = true
+
+    // TODO: This customization didn't seem to work...
+    let tabBarItem = UITabBarItem.appearance()
+    tabBarItem.setTitleTextAttributes(
+      [.font: UIFont.appHeading(textStyle: .caption1)], for: .normal)
+    tabBarItem.setTitleTextAttributes(
+      [.font: UIFont.appHeading(textStyle: .caption1)], for: .selected)
   }
 }
 
@@ -25,29 +60,10 @@ extension SceneController: UIWindowSceneDelegate {
     _ scene: UIScene, willConnectTo session: UISceneSession,
     options connectionOptions: UIScene.ConnectionOptions
   ) {
-    UNUserNotificationCenter.current().delegate = self
-    navigator.delegate = self
-    window?.rootViewController = navigator.rootViewController
-    Task { [weak self] in
-      guard let self else { return }
-      await InstallationID.shared.setDefaultCookie()
-      await MainActor.run {
-        self.navigator.start()
-        if let userActivity = connectionOptions.userActivities.first,
-          userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-          let incomingURL = userActivity.webpageURL
-        {
-          self.deepRouteTo(incomingURL)
-        } else if let response = connectionOptions.notificationResponse {
-          self.handleNotificationTap(response.notification)
-        }
-      }
-    }
-
-    // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-    // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-    // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-    // guard let _ = (scene as? UIWindowScene) else { return }
+    configureAppearance()
+    configureNotificationCenterDelegate()
+    configureTabBarDelegate()
+    setRootControllerAndRoute(connectionOptions)
   }
 
   // Triggers when app is running in the background
@@ -55,41 +71,40 @@ extension SceneController: UIWindowSceneDelegate {
     if userActivity.activityType != NSUserActivityTypeBrowsingWeb {
       return
     }
-    guard let incomingURL = userActivity.webpageURL else {
-      return
+    if let incomingURL = userActivity.webpageURL {
+      Task {
+        await deepRouteTo(incomingURL)
+      }
     }
-    navigator.route(incomingURL)
   }
 
-  func sceneDidDisconnect(_ scene: UIScene) {
-    // Called as the scene is being released by the system.
-    // This occurs shortly after the scene enters the background, or when its session is discarded.
-    // Release any resources associated with this scene that can be re-created the next time the scene connects.
-    // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
-  }
-
-  func sceneDidBecomeActive(_ scene: UIScene) {
-    // Called when the scene has moved from an inactive state to an active state.
-    // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-  }
-
-  func sceneWillResignActive(_ scene: UIScene) {
-    // Called when the scene will move from an active state to an inactive state.
-    // This may occur due to temporary interruptions (ex. an incoming phone call).
-  }
-
-  func sceneWillEnterForeground(_ scene: UIScene) {
-    // Called as the scene transitions from the background to the foreground.
-    // Use this method to undo the changes made on entering the background.
-  }
-
-  func sceneDidEnterBackground(_ scene: UIScene) {
-    // Called as the scene transitions from the foreground to the background.
-    // Use this method to save data, release shared resources, and store enough scene-specific state information
-    // to restore the scene back to its current state.
-  }
+  func sceneDidDisconnect(_ scene: UIScene) {}
+  func sceneDidBecomeActive(_ scene: UIScene) {}
+  func sceneWillResignActive(_ scene: UIScene) {}
+  func sceneWillEnterForeground(_ scene: UIScene) {}
+  func sceneDidEnterBackground(_ scene: UIScene) {}
 
   // MARK: Helpers
+
+  private func setRootControllerAndRoute(_ connectionOptions: UIScene.ConnectionOptions) {
+    guard let window else { return }
+    window.rootViewController = tabBarController
+    Task { [weak self] in
+      guard let self else { return }
+      await InstallationID.shared.setDefaultCookie()
+      await MainActor.run {
+        self.tabBarController.load(HotwireTab.all)
+      }
+      if let userActivity = connectionOptions.userActivities.first,
+        userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+        let incomingURL = userActivity.webpageURL
+      {
+        await self.deepRouteTo(incomingURL)
+      } else if let response = connectionOptions.notificationResponse {
+        await self.handleNotificationTap(response.notification)
+      }
+    }
+  }
 
   private func subRoutes(_ url: URL) -> [URL] {
     var pathComponents = url.pathComponents
@@ -111,25 +126,30 @@ extension SceneController: UIWindowSceneDelegate {
     return result
   }
 
-  private func deepRouteTo(_ url: URL) {
-    log("deepRouteTo", ["url": url])
-    Task { await deepRouteToAsync(url) }
-  }
-
   @MainActor
-  private func deepRouteToAsync(_ url: URL) async {
-    // Wait for current navigation
-    let isInitiallyNavigating = navigationTracker.isNavigating
-    if isInitiallyNavigating {
-      let navigationSucceeded = await navigationTracker.waitForCurrentRequestToFinish()
+  private func deepRouteTo(_ url: URL) async {
+    log("deepRouteTo", ["url": url])
+
+    let targetTab = HotwireTab.targetTab(for: url)
+    let tracker = navigationTracker(for: targetTab)
+
+    // Wait for current navigation in target tab
+    if tracker.isNavigating {
+      let navigationSucceeded = await tracker.waitForCurrentRequestToFinish()
       if !navigationSucceeded {
         return
       }
     }
 
+    // Switch to target tab first
+    switchToTab(targetTab)
+
+    // Now use activeNavigator (which is the target tab's navigator)
+    let navigator = tabBarController.activeNavigator
+
     // If already on route, simply replace it
     if let activeUrl = navigator.activeWebView.url, url.path() == activeUrl.path() {
-      if !isInitiallyNavigating || activeUrl.query() != url.query() {
+      if activeUrl.query() != url.query() {
         logger.debug("Replacing top-level controller with new route")
         navigator.route(url, options: VisitOptions(action: .replace))
       } else {
@@ -139,16 +159,16 @@ extension SceneController: UIWindowSceneDelegate {
     }
 
     // Otherwise clear all controllers and route from root
-    logger.debug("Clearing controllers and routing from root")
+    logger.debug("Clearing tab stack and routing from root")
     navigator.clearAll()
-    for url in subRoutes(url) {
-      logger.debug("Routing to (sub)route: \(url)")
-      let navigationSucceeded = await navigationTracker.waitForCurrentRequestToFinish()
+    for subroute in subRoutes(url) {
+      logger.debug("Routing to (sub)route: \(subroute)")
+      let navigationSucceeded = await tracker.waitForCurrentRequestToFinish()
       if !navigationSucceeded {
         return
       }
-      if let activeUrl = navigator.activeWebView.url, activeUrl.path() != url.path() {
-        navigator.route(url)
+      if let activeUrl = navigator.activeWebView.url, activeUrl.path() != subroute.path() {
+        navigator.route(subroute)
       }
     }
   }
@@ -156,20 +176,76 @@ extension SceneController: UIWindowSceneDelegate {
 
 extension SceneController: NavigatorDelegate {
   func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
-    navigationTracker.visitStarted()
+    let targetTab = HotwireTab.targetTab(for: proposal.url)
+    if targetTab != currentTab() {
+      logger.debug("Received navigation proposal for tab [\(targetTab.url.path())], switching...")
+      switchToTab(targetTab)
+      tabBarController.activeNavigator.route(proposal.url)
+      return .reject
+    }
+
+    let tracker = navigationTracker(for: targetTab)
+    tracker.visitStarted()
     return .accept
   }
 
   func requestDidFinish(at url: URL) {
-    navigationTracker.visitEnded()
+    let targetTab = HotwireTab.targetTab(for: url)
+    log("requestDidFinish", ["url": url, "targetTab": targetTab.url.path()])
+    let tracker = navigationTracker(for: targetTab)
+    tracker.visitEnded()
   }
 
   func visitableDidFailRequest(
     _ visitable: Visitable,
     error: Error,
-    retryHandler: @escaping RetryBlock
+    retryHandler: RetryBlock?
   ) {
-    navigationTracker.visitEnded(success: false)
+    log("visitableDidFailRequest", ["error": error])
+
+    let url = visitable.initialVisitableURL
+    let targetTab = HotwireTab.targetTab(for: url)
+    let tracker = navigationTracker(for: targetTab)
+    tracker.visitEnded(success: false)
+
+    if let turboError = error as? TurboError, case .http(let statusCode) = turboError,
+      statusCode == 401
+    {
+      logger.debug("Got 401 status code; prompting for authentication...")
+      promptForAuthentication()
+    } else if let errorPresenter = visitable as? ErrorPresenter {
+      errorPresenter.presentError(error) {
+        retryHandler?()
+      }
+    } else {
+      let alert = UIAlertController(
+        title: "an error occurred", message: error.localizedDescription, preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+      tabBarController.activeNavigator.present(alert, animated: true)
+    }
+  }
+}
+
+extension SceneController: UITabBarControllerDelegate {
+  func tabBarController(
+    _ tabBarController: UITabBarController, didSelect viewController: UIViewController
+  ) {
+    let selectedTab = HotwireTab.all[tabBarController.selectedIndex]
+    let tracker = navigationTracker(for: selectedTab)
+    logger.debug("Tab [\(selectedTab.url.path())] selected, tracker: \(tracker)")
+    if tracker.isNavigating || tracker.lastNavigationSuccess {
+      return
+    }
+    if let controller = tabBarController as? HotwireTabBarController {
+      logger.debug("Reloading tab [\(selectedTab.url.path())]")
+      controller.activeNavigator.reload()
+    }
+  }
+
+  // MARK: Helpers
+
+  private func configureTabBarDelegate() {
+    tabBarController.delegate = self
   }
 }
 
@@ -190,19 +266,26 @@ extension SceneController: UNUserNotificationCenterDelegate {
     didReceive response: UNNotificationResponse,
     withCompletionHandler completionHandler: @escaping () -> Void
   ) {
-    handleNotificationTap(response.notification)
-    completionHandler()
+    Task {
+      await handleNotificationTap(response.notification)
+      completionHandler()
+    }
   }
 
   // MARK: Helpers
 
-  private func handleNotificationTap(_ notification: UNNotification) {
+  private func configureNotificationCenterDelegate() {
+    UNUserNotificationCenter.current().delegate = self
+  }
+
+  @MainActor
+  private func handleNotificationTap(_ notification: UNNotification) async {
     log("handleNotificationTap", ["notification": notification])
     let userInfo = notification.request.content.userInfo
     guard let targetString = userInfo["target_url"] as? String else { return }
     guard let targetUrl = URL(string: targetString, relativeTo: SmallerWorld.baseURL) else {
       return
     }
-    deepRouteTo(targetUrl)
+    await deepRouteTo(targetUrl)
   }
 }

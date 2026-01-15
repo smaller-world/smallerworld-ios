@@ -10,6 +10,11 @@
 	<array>
 		<string>INSendMessageIntent</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Manrope.ttf</string>
+		<string>Bricolage Grotesque.ttf</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
