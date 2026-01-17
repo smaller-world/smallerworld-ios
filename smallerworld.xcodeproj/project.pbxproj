@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */ = {isa = PBXBuildFile; productRef = 2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */; };
-		2A742A3F2EE7500B00F08F6E /* HotwireNative in Frameworks */ = {isa = PBXBuildFile; productRef = 2A742A3E2EE7500B00F08F6E /* HotwireNative */; };
+		2AB26DEA2F19896A00E448E4 /* HotwireNative in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB26DE92F19896A00E448E4 /* HotwireNative */; };
 		2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABB78382F088EB000EC2451 /* KeychainSwift */; };
 		2ADF84662F0C10F000AE5037 /* smallerworld notification service.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -91,8 +91,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2AB26DEA2F19896A00E448E4 /* HotwireNative in Frameworks */,
 				2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */,
-				2A742A3F2EE7500B00F08F6E /* HotwireNative in Frameworks */,
 				2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -147,9 +147,9 @@
 			);
 			name = smallerworld;
 			packageProductDependencies = (
-				2A742A3E2EE7500B00F08F6E /* HotwireNative */,
 				2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */,
 				2ABB78382F088EB000EC2451 /* KeychainSwift */,
+				2AB26DE92F19896A00E448E4 /* HotwireNative */,
 			);
 			productName = "smallerworld-ios";
 			productReference = 2AC03BE52EE74F0800D9CEAD /* smallerworld.app */;
@@ -205,9 +205,9 @@
 			mainGroup = 2AC03BDC2EE74F0800D9CEAD;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2AC03BFD2EE74F4300D9CEAD /* XCRemoteSwiftPackageReference "hotwire-native-ios" */,
 				2A63D1D92EE8BD0C00ACCFD1 /* XCRemoteSwiftPackageReference "bridge-components" */,
 				2ABB78372F088EB000EC2451 /* XCRemoteSwiftPackageReference "keychain-swift" */,
+				2AB26DE82F19896A00E448E4 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2AC03BE62EE74F0800D9CEAD /* Products */;
@@ -565,20 +565,20 @@
 				minimumVersion = 0.3.1;
 			};
 		};
+		2AB26DE82F19896A00E448E4 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hotwired/hotwire-native-ios";
+			requirement = {
+				branch = "1.3.0-beta";
+				kind = branch;
+			};
+		};
 		2ABB78372F088EB000EC2451 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 24.0.0;
-			};
-		};
-		2AC03BFD2EE74F4300D9CEAD /* XCRemoteSwiftPackageReference "hotwire-native-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/hotwired/hotwire-native-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -589,9 +589,9 @@
 			package = 2A63D1D92EE8BD0C00ACCFD1 /* XCRemoteSwiftPackageReference "bridge-components" */;
 			productName = BridgeComponents;
 		};
-		2A742A3E2EE7500B00F08F6E /* HotwireNative */ = {
+		2AB26DE92F19896A00E448E4 /* HotwireNative */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2AC03BFD2EE74F4300D9CEAD /* XCRemoteSwiftPackageReference "hotwire-native-ios" */;
+			package = 2AB26DE82F19896A00E448E4 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */;
 			productName = HotwireNative;
 		};
 		2ABB78382F088EB000EC2451 /* KeychainSwift */ = {
