@@ -1,5 +1,5 @@
 {
-  "originHash" : "fae6df4c806fba466877c3de96127d0c4bd4c405419da25cb842c535124c7996",
+  "originHash" : "38623f0b9e237daa820a5f4e2c65dbcec601bfd26bc26c9cca55e0716bc544a1",
   "pins" : [
     {
       "identity" : "bridge-components",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hotwired/hotwire-native-ios",
       "state" : {
-        "revision" : "595dba37c4918afd0e2d470109bc0c356d6e9afe",
-        "version" : "1.2.2"
+        "branch" : "1.3.0-beta",
+        "revision" : "e1026cbef049bb3e1bd296e13dc5a965746c9e82"
       }
     },
     {
