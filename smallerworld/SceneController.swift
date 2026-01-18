@@ -63,7 +63,12 @@ extension SceneController: UIWindowSceneDelegate {
     } else if let response = connectionOptions.notificationResponse {
       handleNotificationTap(response.notification)
     }
-    loadTabs()
+    Task {
+      await InstallationID.shared.setDefaultCookie()
+      await MainActor.run {
+        loadTabs()
+      }
+    }
   }
 
   // Triggers when app is running in the background
