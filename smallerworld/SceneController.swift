@@ -1,4 +1,5 @@
 import HotwireNative
+import SafariServices
 import UIKit
 import WebKit
 import os.log
@@ -6,19 +7,8 @@ import os.log
 class SceneController: UIResponder {
   var window: UIWindow?
 
-  //  private var navigationTrackers: [HotwireTab: NavigationTracker] = [:]
   private lazy var tabBarController = HotwireTabBarController(navigatorDelegate: self)
   private var targetURL: URL?
-
-  //  private var rootViewController: UIViewController {
-  //    guard let window else {
-  //      fatalError("Uninitialized window.")
-  //    }
-  //    guard let controller = window.rootViewController else {
-  //      fatalError("Window is missing root view controller.")
-  //    }
-  //    return controller
-  //  }
 
   private func log(_ name: String, _ arguments: [String: Any] = [:]) {
     logger.debug("[SceneController] \(name) \(arguments)")
@@ -38,15 +28,6 @@ class SceneController: UIResponder {
   private func promptForAuthentication() {
     let loginURL = SmallerWorld.baseURL.appendingPathComponent("/login")
     tabBarController.activeNavigator.route(loginURL)
-    // Do nothing if login navigator is set
-    //    if loginNavigator != nil {
-    //      return
-    //    }
-    //    let navigator = buildLoginNavigator()
-    //    self.loginNavigator = navigator
-    //    rootViewController.present(navigator.rootViewController, animated: true) {
-    //      navigator.start()
-    //    }
   }
 
   // TODO: Make this actually work? Not seeing the correct fonts being rendered right now.
@@ -105,72 +86,74 @@ extension SceneController: UIWindowSceneDelegate {
 
   private func loadTabs() {
     tabBarController.load(HotwireTab.all)
-    window!.rootViewController = tabBarController
+    if let window {
+      window.rootViewController = tabBarController
+    } else {
+      fatalError("Window is not available.")
+    }
   }
 
-  //  private func subRoutes(_ url: URL) -> [URL] {
-  //    var pathComponents = url.pathComponents
-  //    pathComponents.removeFirst()
-  //    pathComponents.removeLast()
-  //    guard !pathComponents.isEmpty else { return [url] }
-  //
-  //    var result: [URL] = []
-  //    var currentPath = ""
-  //
-  //    for component in pathComponents {
-  //      currentPath += "/" + component
-  //      if let subroute = URL(string: currentPath, relativeTo: SmallerWorld.baseURL) {
-  //        result.append(subroute)
-  //      }
-  //    }
-  //    result.append(url)
-  //
-  //    return result
-  //  }
+  /// Returns the next "step" URL toward `to`, based on the shared path prefix
+  /// with `from`.
+  ///
+  /// Examples:
+  /// - from: https://smallerworld.club/world
+  ///   to:   https://smallerworld.club/world/friends
+  ///   =>    https://smallerworld.club/world/friends
+  /// - from: https://smallerworld.club/
+  ///   to:   https://smallerworld.club/world/friends
+  ///   =>    https://smallerworld.club/world
+  /// - from: https://smallerworld.club/@kirsamansi
+  ///   to:   https://smallerworld.club/world/friends
+  ///   =>    https://smallerworld.club/world
+  /// - from: nil
+  ///   to:   https://smallerworld.club/world/friends
+  ///   =>    https://smallerworld.club/world
+  private func nextURL(from: URL?, to: URL) -> URL {
+    let fromComponents = from?.pathComponents.filter { $0 != "/" } ?? []
+    let toComponents = to.pathComponents.filter { $0 != "/" }
+    guard !toComponents.isEmpty else { return to }
 
-  //  @MainActor
-  //  private func deepRouteTo(_ url: URL) async {
-  //    log("deepRouteTo", ["url": url])
-  //
-  //    let targetTab = HotwireTab.targetTab(for: url)
-  //    let tabTracker = navigationTracker(for: targetTab)
-  //
-  //    // Wait for current navigation in target tab
-  //    if tabTracker.isNavigating {
-  //      let navigationSucceeded = await tabTracker.waitForCurrentRequestToFinish()
-  //      if !navigationSucceeded {
-  //        return
-  //      }
-  //    }
-  //
-  //    // Switch to target tab first
-  //    switchToTab(targetTab)
-  //
-  //    // Now use activeNavigator (which is the target tab's navigator)
-  //    let navigator = tabBarController.activeNavigator
-  //
-  //    // If already on route, simply replace it
-  //    if let activeUrl = navigator.activeWebView.url, url.path() == activeUrl.path() {
-  //      if activeUrl.query() != url.query() {
-  //        logger.debug("Replacing top-level controller with new route")
-  //        navigator.route(url, options: VisitOptions(action: .replace))
-  //      } else {
-  //        logger.debug("Already navigated to desired URL")
-  //      }
-  //      return
-  //    }
-  //
-  //    // Otherwise clear all controllers and route from root
-  //    logger.debug("Clearing tab stack and routing from root")
-  //    navigator.clearAll()
-  //    for subroute in subRoutes(url) {
-  //      logger.debug("Routing to (sub)route: \(subroute)")
-  //      await tabTracker.waitForCurrentRequestToFinish()
-  //      if let activeUrl = navigator.activeWebView.url, activeUrl.path() != subroute.path() {
-  //        navigator.route(subroute)
-  //      }
-  //    }
-  //  }
+    var prefixCount = 0
+    let maxPrefix = min(fromComponents.count, toComponents.count)
+    while prefixCount < maxPrefix && fromComponents[prefixCount] == toComponents[prefixCount] {
+      prefixCount += 1
+    }
+
+    let nextCount = min(prefixCount + 1, toComponents.count)
+    if nextCount == toComponents.count {
+      return to
+    }
+
+    let nextPath = "/" + toComponents.prefix(nextCount).joined(separator: "/")
+    var components = URLComponents(url: to, resolvingAgainstBaseURL: false)
+    components?.path = nextPath
+    components?.query = nil
+    components?.fragment = nil
+    return components?.url ?? to
+  }
+
+  private func routeTowards(_ targetURL: URL) -> Bool {
+    if targetURL.host() != SmallerWorld.baseURL.host() {
+      let safariViewController = SFSafariViewController(url: targetURL)
+      safariViewController.dismissButtonStyle = .close
+      tabBarController.present(safariViewController, animated: true)
+      return true
+    }
+    let targetTab = HotwireTab.targetTab(for: targetURL)
+    if targetTab != currentTab() {
+      switchToTab(targetTab)
+    }
+    let navigator = tabBarController.activeNavigator
+    if let currentURL = navigator.activeWebView.url,
+      currentURL == targetURL
+    {
+      return true
+    }
+    let nextURL = nextURL(from: navigator.activeWebView.url, to: targetURL)
+    navigator.route(nextURL)
+    return nextURL == targetURL
+  }
 }
 
 extension SceneController: NavigatorDelegate {
@@ -195,6 +178,11 @@ extension SceneController: NavigatorDelegate {
   // TODO: Deep route if targetURL is set.
   func requestDidFinish(at url: URL) {
     log("requestDidFinish", ["url": url])
+    if let targetURL {
+      if routeTowards(targetURL) {
+        self.targetURL = nil
+      }
+    }
   }
 
   func visitableDidFailRequest(
