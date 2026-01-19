@@ -22,15 +22,18 @@ extension HotwireTab {
     url: SmallerWorld.baseURL.appendingPathComponent("/spaces")
   )
 
-  /// Get the tab that should handle a given URL based on path prefix
-  static func targetTab(for url: URL) -> HotwireTab {
+  /// Get the tab that should handle a given URL based on path prefix.
+  static func targetTab(for url: URL) -> HotwireTab? {
     let path = url.path()
-    if path.hasPrefix("/universe") || path.hasPrefix("/@") {
+    if path.hasPrefix("/universe") {
       return .universe
     }
     if path.hasPrefix("/spaces") {
       return .spaces
     }
-    return .world
+    if path.hasPrefix("/world") {
+      return .world
+    }
+    return nil
   }
 }
