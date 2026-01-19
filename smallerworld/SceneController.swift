@@ -145,8 +145,8 @@ extension SceneController: UIWindowSceneDelegate {
       tabBarController.present(safariViewController, animated: true)
       return true
     }
-    let targetTab = HotwireTab.targetTab(for: targetURL)
-    if targetTab != currentTab() {
+    if let targetTab = HotwireTab.targetTab(for: targetURL),
+      targetTab != currentTab() {
       switchToTab(targetTab)
     }
     let navigator = tabBarController.activeNavigator
@@ -163,15 +163,15 @@ extension SceneController: UIWindowSceneDelegate {
 
 extension SceneController: NavigatorDelegate {
   func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
+    let targetTab = HotwireTab.targetTab(for: proposal.url)
     log(
       "handle",
       [
         "url": proposal.url.absoluteString,
-        "targetTab": HotwireTab.targetTab(for: proposal.url).title,
+        "targetTab": String(describing: targetTab?.title),
         "currentTab": currentTab().title,
       ])
-    let targetTab = HotwireTab.targetTab(for: proposal.url)
-    if targetTab != currentTab() {
+    if let targetTab, targetTab != currentTab() {
       logger.debug("Received navigation proposal for tab (\(targetTab.title)), switching...")
       switchToTab(targetTab)
       tabBarController.activeNavigator.route(proposal.url)
