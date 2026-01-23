@@ -46,11 +46,23 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
-        navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.white
-        ]
+        
+        styleNavigationBar()
+        addHostingController()
+    }
 
+    // MARK: Helpers
+
+    private func styleNavigationBar() {
+        guard let navigationBar = navigationController?.navigationBar else {
+            return
+        }
+        let appearance = AppUI.navigationBarAppearance()
+        appearance.titleTextAttributes[.foregroundColor] = UIColor.white
+        navigationBar.standardAppearance = appearance
+    }
+
+    private func addHostingController() {
         addChild(hostingController)
         hostingController.view.frame = view.bounds
         hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -66,7 +78,7 @@ private struct ScannerView: View {
         GeometryReader { proxy in
             let size = proxy.size
             let scanFrameSize = size.width / 1.8
-            let frameSize = size.width / 1.5
+            let frameSize = size.width / 1.55
             let frameOriginY = (size.height - frameSize) / 2
             let cutoutRect = CGRect(
                 x: (size.width - scanFrameSize) / 2,
@@ -142,7 +154,7 @@ private struct CutoutOverlay: View {
                     cornerSize: CGSize(width: cornerRadius, height: cornerRadius)
                 )
             }
-            .fill(Color.black.opacity(0.5), style: FillStyle(eoFill: true))
+            .fill(Color.black.opacity(0.4), style: FillStyle(eoFill: true))
         }
     }
 }

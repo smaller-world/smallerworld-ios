@@ -60,34 +60,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-
+    
     // MARK: Helpers
 
     private func styleApplication() {
-        styleNavigationBar()
-        styleTabBarItems()
-    }
-
-    private func styleNavigationBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithDefaultBackground()
-        if let font = UIFont(name: AppFont.headingSemiBold, size: 17),
-            let largeFont = UIFont(name: AppFont.headingBold, size: 34)
-        {
-            appearance.titleTextAttributes[.font] = font
-            appearance.largeTitleTextAttributes[.font] = largeFont
-        }
-        UINavigationBar.appearance().standardAppearance = appearance
-    }
-
-    private func styleTabBarItems() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-        if let font = UIFont(name: AppFont.headingMedium, size: 10) {
-            appearance.stackedLayoutAppearance.normal.titleTextAttributes[.font] = font
-            appearance.stackedLayoutAppearance.selected.titleTextAttributes[.font] = font
-        }
-        UITabBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().standardAppearance = AppUI.navigationBarAppearance()
+        UITabBar.appearance().standardAppearance = AppUI.tabBarAppearance()
     }
 
     private func configureHotwire() {
