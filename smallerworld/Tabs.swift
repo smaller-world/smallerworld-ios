@@ -3,6 +3,11 @@ import UIKit
 
 extension HotwireTab {
   static let all: [HotwireTab] = [.world, .universe, .spaces]
+  // static let byID: [String: HotwireTab] = [
+  //   "world": .world,
+  //   "universe": .universe,
+  //   "spaces": .spaces
+  // ]
 
   static let world = HotwireTab(
     title: "your world",
@@ -24,16 +29,35 @@ extension HotwireTab {
 
   /// Get the tab that should handle a given URL based on path prefix.
   static func targetTab(for url: URL) -> HotwireTab? {
-    let path = url.path()
-    if path.hasPrefix("/universe") {
+    // if let tabID = requestedTabID(url), let tab = byID[tabID] {
+    //   return tab
+    // }
+    if isPathOrHasPrefix(url.path, target: "/world") {
+      return .world
+    }
+    if isPathOrHasPrefix(url.path, target: "/universe") {
       return .universe
     }
-    if path.hasPrefix("/spaces") {
+    if isPathOrHasPrefix(url.path, target: "/spaces") {
       return .spaces
-    }
-    if path.hasPrefix("/world") {
-      return .world
     }
     return nil
   }
+
+  private static func isPathOrHasPrefix(_ path: String, target: String) -> Bool {
+    if path == target {
+      return true
+    }
+    return path.hasPrefix(target + "/")
+  }
+
+  // private static func requestedTabID(_ url: URL) -> String? {
+  //   guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+  //     return nil
+  //   }
+  //   let item = components.queryItems?.first { queryItem in
+  //     queryItem.name == "native_tab"
+  //   }
+  //   return item?.value
+  // }
 }

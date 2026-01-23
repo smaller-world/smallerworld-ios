@@ -1,4 +1,24 @@
 {
+  // == Editor
+  "editor.formatOnSave": true,
+  "[swift]": {
+    "editor.defaultFormatter": "sweetpad.sweetpad"
+  },
+
+  // == Swift
+  "sweetpad.format.args": [
+    "--configuration",
+    ".swift-format",
+    "--in-place",
+    "${file}"
+  ],
+
+  // == Files
+  "files.associations": {
+    ".swift-format": "json"
+  },
+
+  // == LLDB
   "lldb.library": "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
   "lldb.launch.expressions": "native"
 }
