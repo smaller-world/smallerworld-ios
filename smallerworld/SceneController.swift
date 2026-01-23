@@ -301,7 +301,6 @@ extension SceneController: QRCodeScannerDelegate {
         _ controller: UIViewController,
         didScanQRCodeWithResult result: ScanResult,
     ) {
-        controller.dismiss(animated: true)
         let trimmedResult = result.string.trimmingCharacters(in: .whitespacesAndNewlines)
         guard
             var url = URL(
@@ -337,7 +336,7 @@ extension SceneController: QRCodeScannerDelegate {
             return url
         }
         components.path = url.path
-        components.query = url.query
+        components.query = url.query(percentEncoded: false)
         components.fragment = url.fragment
         return components.url ?? url
     }
