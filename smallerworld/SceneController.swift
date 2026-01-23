@@ -147,7 +147,7 @@ extension SceneController: UIWindowSceneDelegate {
     }
 
     private func routeTowards(_ url: URL) -> Bool {
-        if url.host() != SmallerWorld.baseURL.host() {
+        if !SmallerWorld.isAppURL(url) {
             let safariViewController = SFSafariViewController(url: url)
             safariViewController.dismissButtonStyle = .close
             tabBarController.present(safariViewController, animated: true)
@@ -310,10 +310,8 @@ extension SceneController: QRCodeScannerDelegate {
         else {
             return
         }
-        #if DEBUG
-            url = rewriteURLWithCanonicalBaseURL(url)
-        #endif
-        route(url)
+        let canonicalURL = rewriteURLWithCanonicalBaseURL(url)
+        route(canonicalURL)
     }
 
     func qrCodeScanner(
@@ -327,6 +325,9 @@ extension SceneController: QRCodeScannerDelegate {
     // MARK: Helpers
 
     private func rewriteURLWithCanonicalBaseURL(_ url: URL) -> URL {
+        if !SmallerWorld.isAppURL(url) {
+            return url
+        }
         guard
             var components = URLComponents(
                 url: SmallerWorld.baseURL,
