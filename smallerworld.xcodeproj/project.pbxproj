@@ -10,6 +10,7 @@
 		2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */ = {isa = PBXBuildFile; productRef = 2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */; };
 		2AB26DEA2F19896A00E448E4 /* HotwireNative in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB26DE92F19896A00E448E4 /* HotwireNative */; };
 		2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABB78382F088EB000EC2451 /* KeychainSwift */; };
+		2ACF3E322F218B0600827B31 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 2ACF3E312F218B0600827B31 /* CodeScanner */; };
 		2ADF84662F0C10F000AE5037 /* smallerworld notification service.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -91,6 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2ACF3E322F218B0600827B31 /* CodeScanner in Frameworks */,
 				2AB26DEA2F19896A00E448E4 /* HotwireNative in Frameworks */,
 				2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */,
 				2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */,
@@ -150,6 +152,7 @@
 				2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */,
 				2ABB78382F088EB000EC2451 /* KeychainSwift */,
 				2AB26DE92F19896A00E448E4 /* HotwireNative */,
+				2ACF3E312F218B0600827B31 /* CodeScanner */,
 			);
 			productName = "smallerworld-ios";
 			productReference = 2AC03BE52EE74F0800D9CEAD /* smallerworld.app */;
@@ -208,6 +211,7 @@
 				2A63D1D92EE8BD0C00ACCFD1 /* XCRemoteSwiftPackageReference "bridge-components" */,
 				2ABB78372F088EB000EC2451 /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				2AB26DE82F19896A00E448E4 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */,
+				2ACF3E302F218B0600827B31 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2AC03BE62EE74F0800D9CEAD /* Products */;
@@ -581,6 +585,14 @@
 				minimumVersion = 24.0.0;
 			};
 		};
+		2ACF3E302F218B0600827B31 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:twostraws/CodeScanner.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -598,6 +610,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2ABB78372F088EB000EC2451 /* XCRemoteSwiftPackageReference "keychain-swift" */;
 			productName = KeychainSwift;
+		};
+		2ACF3E312F218B0600827B31 /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2ACF3E302F218B0600827B31 /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

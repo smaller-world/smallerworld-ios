@@ -1,13 +1,22 @@
 {
-  "originHash" : "38623f0b9e237daa820a5f4e2c65dbcec601bfd26bc26c9cca55e0716bc544a1",
+  "originHash" : "c62fd271c69110541818a9f9d774df8c53235c3757064e1eadf212ece96771a7",
   "pins" : [
     {
       "identity" : "bridge-components",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/joemasilotti/bridge-components",
       "state" : {
-        "revision" : "10f8d7224b36478d4ffcd4c4dc6da08f043eeb50",
-        "version" : "0.12.1"
+        "revision" : "6899bfcde8003d1bed34ff83ee7a53e6394c17fb",
+        "version" : "0.12.2"
+      }
+    },
+    {
+      "identity" : "codescanner",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:twostraws/CodeScanner.git",
+      "state" : {
+        "revision" : "5e886430238944c7200fc9e10dbf2d9550dba865",
+        "version" : "2.5.2"
       }
     },
     {

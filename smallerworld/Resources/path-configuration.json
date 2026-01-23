@@ -8,10 +8,24 @@
       }
     },
     {
-      "patterns": ["^/settings$", "/new$", "/edit$", "^/login"],
+      "patterns": [
+        "^/settings$",
+        "/new$",
+        "/edit$",
+        "/join$",
+        "/invite$",
+        "^/login"
+      ],
       "properties": {
         "context": "modal",
         "pull_to_refresh_enabled": false
+      }
+    },
+    {
+      "patterns": ["^/scan_qr_code$"],
+      "properties": {
+        "view_controller": "qr_code_scanner",
+        "context": "modal"
       }
     },
     {
