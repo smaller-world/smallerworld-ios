@@ -61,7 +61,7 @@ extension SceneController: UIWindowSceneDelegate {
             userActivity.activityType == NSUserActivityTypeBrowsingWeb,
             let incomingURL = userActivity.webpageURL
         {
-            targetURL = incomingURL
+            targetURL = rewriteURLWithCanonicalBaseURL(incomingURL)
         } else if let response = connectionOptions.notificationResponse,
             let targetURL = notificationTargetURL(response.notification)
         {
@@ -81,8 +81,9 @@ extension SceneController: UIWindowSceneDelegate {
             return
         }
         if let incomingURL = userActivity.webpageURL {
-            targetURL = incomingURL
-            if routeTowards(incomingURL) {
+            let canonicalURL = rewriteURLWithCanonicalBaseURL(incomingURL)
+            targetURL = canonicalURL
+            if routeTowards(canonicalURL) {
                 targetURL = nil
             }
         }
@@ -303,7 +304,7 @@ extension SceneController: QRCodeScannerDelegate {
     ) {
         let trimmedResult = result.string.trimmingCharacters(in: .whitespacesAndNewlines)
         guard
-            var url = URL(
+            let url = URL(
                 string: trimmedResult,
                 relativeTo: SmallerWorld.baseURL
             )
