@@ -46,8 +46,9 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         styleNavigationBar()
+        addCloseButtonToModals()
         addHostingController()
     }
 
@@ -62,6 +63,16 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
         navigationBar.standardAppearance = appearance
     }
 
+    private func addCloseButtonToModals() {
+        if presentingViewController != nil {
+            let action = UIAction { [unowned self] _ in
+                dismiss(animated: true)
+            }
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                systemItem: .close, primaryAction: action)
+        }
+    }
+
     private func addHostingController() {
         addChild(hostingController)
         hostingController.view.frame = view.bounds
@@ -73,6 +84,7 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
 
 private struct ScannerView: View {
     let completion: (Result<ScanResult, ScanError>) -> Void
+    @State private var isTorchOn = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -87,7 +99,7 @@ private struct ScannerView: View {
                 height: scanFrameSize
             )
             ZStack {
-                CodeScannerView(codeTypes: [.qr], completion: completion)
+                CodeScannerView(codeTypes: [.qr], isTorchOn: isTorchOn, completion: completion)
                     .ignoresSafeArea()
 
                 ScannerOverlay(
@@ -95,7 +107,8 @@ private struct ScannerView: View {
                     frameSize: frameSize,
                     cornerRadius: 20,
                     cornerLength: 22,
-                    frameLineWidth: 6
+                    frameLineWidth: 6,
+                    isTorchOn: $isTorchOn
                 )
             }
         }
@@ -109,6 +122,7 @@ private struct ScannerOverlay: View {
     let cornerRadius: CGFloat
     let cornerLength: CGFloat
     let frameLineWidth: CGFloat
+    @Binding var isTorchOn: Bool
 
     var body: some View {
         GeometryReader { proxy in
@@ -120,6 +134,7 @@ private struct ScannerOverlay: View {
             ZStack {
                 CutoutOverlay(cutoutRect: cutoutRect, cornerRadius: cornerRadius)
                     .ignoresSafeArea()
+                    .allowsHitTesting(false)
 
                 CornerFrame(
                     cornerRadius: cornerRadius,
@@ -129,15 +144,56 @@ private struct ScannerOverlay: View {
                 .stroke(Color.white, style: StrokeStyle(lineWidth: frameLineWidth, lineCap: .round))
                 .frame(width: frameSize, height: frameSize)
                 .position(x: frameOrigin.x + frameSize / 2, y: frameOrigin.y + frameSize / 2)
+                .allowsHitTesting(false)
 
                 Text("align QR code within frame")
                     .font(.custom(AppFont.body, size: 14))
                     .fontWeight(.semibold)
                     .foregroundColor(Color.white.opacity(0.85))
                     .position(x: size.width / 2, y: frameOrigin.y - 24)
+                    .allowsHitTesting(false)
+
+                FlashlightButton(isTorchOn: $isTorchOn)
+                    .position(x: size.width / 2, y: frameOrigin.y + frameSize + 44)
+                    .allowsHitTesting(true)
             }
         }
-        .allowsHitTesting(false)
+    }
+}
+
+private struct FlashlightButton: View {
+    @Binding var isTorchOn: Bool
+
+    @ViewBuilder
+    var base: some View {
+        let label = isTorchOn ? "Turn off flashlight" : "Turn on flashlight"
+        let icon = isTorchOn ? "flashlight.off.fill" : "flashlight.on.fill"
+        let button = Button(action: { isTorchOn.toggle() }, label: {
+            let label = Label(label, systemImage: icon)
+                .font(.title)
+                .padding(4)
+                .labelStyle(.iconOnly)
+            if isTorchOn {
+                label.colorInvert()
+            } else {
+                label
+            }
+        })
+            .buttonBorderShape(.circle)
+        if isTorchOn {
+            button.tint(.white)
+        } else {
+            button
+        }
+    }
+
+    @ViewBuilder
+    var body: some View {
+        if !isTorchOn, #available(iOS 26.0, *) {
+            base.buttonStyle(.glass)
+        } else {
+            base.buttonStyle(.borderedProminent)
+        }
     }
 }
 
