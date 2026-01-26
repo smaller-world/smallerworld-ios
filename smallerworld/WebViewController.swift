@@ -11,6 +11,7 @@ class WebViewController: HotwireWebViewController {
 
         styleBackground()
         addTopDecoration()
+        addCloseButtonToModals()
     }
 
     open override func viewWillAppear(_ animated: Bool) {
@@ -36,6 +37,15 @@ class WebViewController: HotwireWebViewController {
             topDecoration.topAnchor.constraint(equalTo: view.topAnchor),
             topDecoration.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
         ])
+    }
+
+    private func addCloseButtonToModals() {
+        if presentingViewController != nil {
+            let action = UIAction { [unowned self] _ in
+                dismiss(animated: true)
+            }
+            navigationItem.leftBarButtonItem = UIBarButtonItem(systemItem: .close, primaryAction: action)
+        }
     }
 
     private func updateTopDecorationVisibility() {
