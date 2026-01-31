@@ -55,8 +55,6 @@ extension SceneController: UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
-        UNUserNotificationCenter.current().delegate = self
-        self.tabBarController.delegate = self
         if let userActivity = connectionOptions.userActivities.first,
             userActivity.activityType == NSUserActivityTypeBrowsingWeb,
             let incomingURL = userActivity.webpageURL
@@ -71,6 +69,7 @@ extension SceneController: UIWindowSceneDelegate {
             await InstallationID.shared.setDefaultCookie()
             await MainActor.run {
                 loadTabs()
+                UNUserNotificationCenter.current().delegate = self
             }
         }
     }
@@ -98,8 +97,8 @@ extension SceneController: UIWindowSceneDelegate {
     // MARK: Helpers
 
     private func loadTabs() {
+        tabBarController.delegate = self
         tabBarController.load(HotwireTab.all)
-//        tabBarController.styleTabBarItems()
         if let window {
             window.rootViewController = tabBarController
         } else {
@@ -261,6 +260,10 @@ extension SceneController: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
+        // Guard against crash when notification is received before tabs are loaded
+        // guard HotwireTab.all.indices.contains(tabBarController.selectedIndex) else {
+        //     return
+        // }
         if let targetURL = notificationTargetURL(response.notification) {
             self.targetURL = targetURL
             if routeTowards(targetURL) {
