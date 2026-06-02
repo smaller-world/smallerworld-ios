@@ -8,29 +8,21 @@ import os.log
 class SceneController: UIResponder {
     var window: UIWindow?
 
-    private lazy var tabBarController = HotwireTabBarController(navigatorDelegate: self)
     private var targetURL: URL?
     private var lastErroredURL: URL?
+    private lazy var navigator = Navigator(
+        configuration: .init(
+            name: "main",
+            startLocation: SmallerWorld.homeURL
+        ),
+        delegate: self,
+    )
 
     private func log(_ name: String, _ arguments: [String: Any] = [:]) {
         logger.debug("[SceneController] \(name) \(arguments)")
     }
 
-    private func switchToTab(_ tab: HotwireTab) {
-        guard let tabIndex = HotwireTab.all.firstIndex(of: tab) else {
-            return
-        }
-        tabBarController.selectedIndex = tabIndex
-    }
-
     private func route(_ url: URL, options: VisitOptions? = nil) {
-        if let targetTab = HotwireTab.targetTab(for: url),
-            targetTab != currentTab()
-        {
-            switchToTab(targetTab)
-        }
-
-        let navigator = tabBarController.activeNavigator
         if let currentURL = navigator.activeWebView.url, currentURL == url {
             return
         }
@@ -38,13 +30,9 @@ class SceneController: UIResponder {
         navigator.route(url, options: options)
     }
 
-    private func currentTab() -> HotwireTab {
-        HotwireTab.all[tabBarController.selectedIndex]
-    }
-
     private func promptForAuthentication() {
-        let loginURL = SmallerWorld.baseURL.appendingPathComponent("/login")
-        tabBarController.activeNavigator.route(loginURL)
+        let loginURL = SmallerWorld.baseURL.appendingPathComponent("/sessions/new")
+        route(loginURL)
     }
 }
 
@@ -55,6 +43,7 @@ extension SceneController: UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
+        window?.rootViewController = navigator.rootViewController
         if let userActivity = connectionOptions.userActivities.first,
             userActivity.activityType == NSUserActivityTypeBrowsingWeb,
             let incomingURL = userActivity.webpageURL
@@ -68,8 +57,8 @@ extension SceneController: UIWindowSceneDelegate {
         Task {
             await InstallationID.shared.setDefaultCookie()
             await MainActor.run {
-                loadTabs()
                 UNUserNotificationCenter.current().delegate = self
+                navigator.start()
             }
         }
     }
@@ -96,101 +85,118 @@ extension SceneController: UIWindowSceneDelegate {
 
     // MARK: Helpers
 
-    private func loadTabs() {
-        tabBarController.delegate = self
-        tabBarController.load(HotwireTab.all)
-        if let window {
-            window.rootViewController = tabBarController
-        } else {
-            fatalError("Window is not available.")
+    /// Splits a URL's path into route segments, merging any segment whose
+    /// `"/" + name` appears in `SmallerWorld.unroutablePaths` with the segment
+    /// that follows it. `nil` and `SmallerWorld.homeURL` both return `[]`.
+    ///
+    /// Examples (with unroutablePaths = ["/worlds"]):
+    /// - nil                        => []
+    /// - /home                      => []
+    /// - /worlds/asdf-12-23         => ["worlds/asdf-12-23"]
+    /// - /worlds/asdf-12-23/keys    => ["worlds/asdf-12-23", "keys"]
+    static func routeSegments(of url: URL?) -> [String] {
+        guard let url else { return [] }
+        if url.path == SmallerWorld.homeURL.path { return [] }
+        let raw = url.pathComponents.filter { $0 != "/" }
+        var result: [String] = []
+        var i = 0
+        while i < raw.count {
+            let asPath = "/" + raw[i]
+            if SmallerWorld.unroutablePaths.contains(asPath), i + 1 < raw.count {
+                result.append(raw[i] + "/" + raw[i + 1])
+                i += 2
+            } else {
+                result.append(raw[i])
+                i += 1
+            }
         }
+        return result
     }
 
-    /// Returns the next "step" URL toward `to`, based on the shared path prefix
-    /// with `from`.
+    /// Builds a URL with the given route segments joined into its path
+    /// (relative to `SmallerWorld.baseURL`). Empty segments yield `homeURL`.
+    static func url(forRouteSegments segments: [String]) -> URL {
+        if segments.isEmpty { return SmallerWorld.homeURL }
+        let path = "/" + segments.joined(separator: "/")
+        return SmallerWorld.baseURL.appendingPathComponent(path)
+    }
+
+    /// Returns the next URL to land on while routing from `from` toward `to`.
+    /// The caller decides whether to push or pop based on whether the returned
+    /// URL is already present in the navigation stack.
     ///
-    /// Examples:
-    /// - from: https://smallerworld.club/world
-    ///   to:   https://smallerworld.club/world/friends
-    ///   =>    https://smallerworld.club/world/friends
-    /// - from: https://smallerworld.club/
-    ///   to:   https://smallerworld.club/world/friends
-    ///   =>    https://smallerworld.club/world
-    /// - from: https://smallerworld.club/@kirsamansi
-    ///   to:   https://smallerworld.club/world/friends
-    ///   =>    https://smallerworld.club/world
-    /// - from: nil
-    ///   to:   https://smallerworld.club/world/friends
-    ///   =>    https://smallerworld.club/world
-    private func nextURL(from: URL?, to: URL) -> URL {
-        let fromComponents = from?.pathComponents.filter { $0 != "/" } ?? []
-        let toComponents = to.pathComponents.filter { $0 != "/" }
-        guard !toComponents.isEmpty else { return to }
+    /// Examples (with /home as root, /worlds unroutable):
+    /// - from: /worlds/jordana        to: /home                => /home
+    /// - from: /worlds/jordana        to: /worlds/freddy       => /home
+    /// - from: /worlds/jordana/keys   to: /worlds/jordana      => /worlds/jordana
+    /// - from: /home                  to: /worlds/jordana      => /worlds/jordana
+    /// - from: /worlds/freddy         to: /worlds/freddy/keys  => /worlds/freddy/keys
+    static func nextURL(from: URL?, to: URL) -> URL {
+        let fromSegs = routeSegments(of: from)
+        let toSegs = routeSegments(of: to)
 
         var prefixCount = 0
-        let maxPrefix = min(fromComponents.count, toComponents.count)
-        while prefixCount < maxPrefix && fromComponents[prefixCount] == toComponents[prefixCount] {
+        let maxPrefix = min(fromSegs.count, toSegs.count)
+        while prefixCount < maxPrefix && fromSegs[prefixCount] == toSegs[prefixCount] {
             prefixCount += 1
         }
 
-        let nextCount = min(prefixCount + 1, toComponents.count)
-        if nextCount == toComponents.count {
-            return to
+        if prefixCount == fromSegs.count {
+            // Advancing toward `to` (or already there).
+            if prefixCount == toSegs.count { return to }
+            return Self.url(forRouteSegments: Array(toSegs.prefix(prefixCount + 1)))
         }
-
-        let nextPath = "/" + toComponents.prefix(nextCount).joined(separator: "/")
-        var components = URLComponents(url: to, resolvingAgainstBaseURL: false)
-        components?.path = nextPath
-        components?.query = nil
-        components?.fragment = nil
-        return components?.url ?? to
+        // Retreating to the deepest shared ancestor.
+        return Self.url(forRouteSegments: Array(toSegs.prefix(prefixCount)))
     }
 
+    // Does an incremental route towards url, returns true if routing is complete, returns
+    // false if routing needs to be continued (via requestDidFinish, or via the CATransaction
+    // completion block after an animated pop).
     private func routeTowards(_ url: URL) -> Bool {
         if !SmallerWorld.isAppURL(url) {
             let safariViewController = SFSafariViewController(url: url)
             safariViewController.dismissButtonStyle = .close
-            tabBarController.present(safariViewController, animated: true)
+            navigator.rootViewController.present(safariViewController, animated: true)
             return true
         }
-        if let targetTab = HotwireTab.targetTab(for: url),
-            targetTab != currentTab()
-        {
-            switchToTab(targetTab)
-        }
-        let navigator = tabBarController.activeNavigator
-        if let currentURL = navigator.activeWebView.url,
-            currentURL == url
-        {
+        if let currentURL = navigator.activeWebView.url, currentURL == url {
             return true
         }
-        let nextURL = nextURL(from: navigator.activeWebView.url, to: url)
-        navigator.route(nextURL)
-        return nextURL == url
+
+        let next = Self.nextURL(from: navigator.activeWebView.url, to: url)
+
+        // If `next` is already on the navigation stack, pop to it (animated) and
+        // resume routing from the completion block.
+        let nav = navigator.rootViewController
+        if let targetVC = nav.viewControllers.last(where: { vc in
+            guard let visitable = vc as? Visitable else { return false }
+            return visitable.currentVisitableURL.path() == next.path()
+        }), targetVC !== nav.topViewController {
+            CATransaction.begin()
+            CATransaction.setCompletionBlock { [weak self] in
+                guard let self, let target = self.targetURL else { return }
+                if self.routeTowards(target) { self.targetURL = nil }
+            }
+            nav.popToViewController(targetVC, animated: true)
+            CATransaction.commit()
+            return false
+        }
+
+        navigator.route(next)
+        return next == url
     }
 }
 
 extension SceneController: NavigatorDelegate {
     func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
-        let targetTab = HotwireTab.targetTab(for: proposal.url)
         log(
             "handle",
             [
                 "url": proposal.url.absoluteString,
                 "viewController": String(describing: proposal.viewController),
-                "targetTab": String(describing: targetTab?.title),
-                "currentTab": currentTab().title,
-            ])
-        if let targetTab, targetTab != currentTab() {
-            logger.debug(
-                "Received navigation proposal for tab (\(targetTab.title)), switching..."
-            )
-            targetURL = proposal.url
-            if routeTowards(proposal.url) {
-                targetURL = nil
-            }
-            return .reject
-        }
+            ]
+        )
         switch proposal.viewController {
         case QRCodeScannerController.pathConfigurationIdentifier:
             let controller = buildQRCodeScannerController()
@@ -200,7 +206,7 @@ extension SceneController: NavigatorDelegate {
         }
     }
 
-    // TODO: Deep route if targetURL is set.
+    // Continues routing towards targetURL unless currently errored.
     func requestDidFinish(at url: URL) {
         let isLastErroredURL = lastErroredURL == url
         log(
@@ -234,7 +240,16 @@ extension SceneController: NavigatorDelegate {
             errorPresenter.presentError(error, retryHandler: retryHandler)
         }
     }
-
+    
+//    func formSubmissionDidFinish(at url: URL) {
+//        log("formSubmissionDidFinish", ["url": url])
+//        for vc in navigator.rootViewController.viewControllers {
+//            if vc != self, let webViewController = vc as? WebViewController {
+//                webViewController.markContentAsStale()
+//            }
+//        }
+//    }
+//
     // MARK: Helpers
 
     private func buildQRCodeScannerController() -> QRCodeScannerController {
@@ -281,22 +296,6 @@ extension SceneController: UNUserNotificationCenterDelegate {
             return nil
         }
         return URL(string: targetString, relativeTo: SmallerWorld.baseURL)
-    }
-}
-
-extension SceneController: UITabBarControllerDelegate {
-    public func tabBarController(
-        _ tabBarController: UITabBarController,
-        didSelect viewController: UIViewController
-    ) {
-        let navigator = self.tabBarController.activeNavigator
-        if navigator.rootViewController.viewControllers.isEmpty,
-            navigator.modalRootViewController.viewControllers.isEmpty
-        {
-            navigator.start()
-        } else if navigator.activeWebView.isHidden && !navigator.activeWebView.isLoading {
-            navigator.reload()
-        }
     }
 }
 

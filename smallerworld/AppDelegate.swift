@@ -82,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return webView
         }
 //        Hotwire.config.showDoneButtonOnModals = true
-        Hotwire.config.animateReplaceActions = true
+//        Hotwire.config.animateReplaceActions = true
 
         // == Bridge components
         var components = Bridgework.coreComponents
@@ -93,8 +93,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // == Path configuration
         Hotwire.config.pathConfiguration.matchQueryStrings = false
         Hotwire.loadPathConfiguration(from: [
-            .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!)
-            //      .server(SmallerWorld.pathConfigurationURL),
+            .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!),
+//            .server(SmallerWorld.pathConfigurationURL),
         ])
 
         // == Debugging

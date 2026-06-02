@@ -8,19 +8,25 @@
 
 /* Begin PBXBuildFile section */
 		2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */ = {isa = PBXBuildFile; productRef = 2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */; };
-		2AB26DEA2F19896A00E448E4 /* HotwireNative in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB26DE92F19896A00E448E4 /* HotwireNative */; };
 		2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABB78382F088EB000EC2451 /* KeychainSwift */; };
 		2ACF3E322F218B0600827B31 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 2ACF3E312F218B0600827B31 /* CodeScanner */; };
 		2ADF84662F0C10F000AE5037 /* smallerworld notification service.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		2ADF84642F0C10F000AE5037 /* PBXContainerItemProxy */ = {
+		2A4CF8A92FCB637400652EDD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2AC03BDD2EE74F0800D9CEAD /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 2ADF845E2F0C10F000AE5037;
-			remoteInfo = "notification-service";
+			remoteInfo = "smallerworld notification service";
+		};
+		2A53204B2FCB622600EC8D5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2AC03BDD2EE74F0800D9CEAD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2AC03BE42EE74F0800D9CEAD;
+			remoteInfo = smallerworld;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -39,6 +45,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2A5320472FCB622600EC8D5A /* smallerworldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = smallerworldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AC03BE52EE74F0800D9CEAD /* smallerworld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = smallerworld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "smallerworld notification service.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -51,7 +58,7 @@
 			);
 			target = 2AC03BE42EE74F0800D9CEAD /* smallerworld */;
 		};
-		2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworld notification service" folder in "smallerworld notification service" target */ = {
+		2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworldNotifications" folder in "smallerworld notification service" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -68,6 +75,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		2A5320482FCB622600EC8D5A /* smallerworldTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = smallerworldTests;
+			sourceTree = "<group>";
+		};
 		2AC03BE72EE74F0800D9CEAD /* smallerworld */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -77,23 +89,29 @@
 			path = smallerworld;
 			sourceTree = "<group>";
 		};
-		2ADF84602F0C10F000AE5037 /* smallerworld notification service */ = {
+		2ADF84602F0C10F000AE5037 /* smallerworldNotifications */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworld notification service" folder in "smallerworld notification service" target */,
+				2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworldNotifications" folder in "smallerworld notification service" target */,
 			);
-			path = "smallerworld notification service";
+			path = smallerworldNotifications;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2A5320442FCB622600EC8D5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2AC03BE22EE74F0800D9CEAD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				2ACF3E322F218B0600827B31 /* CodeScanner in Frameworks */,
-				2AB26DEA2F19896A00E448E4 /* HotwireNative in Frameworks */,
 				2ABB78392F088EB000EC2451 /* KeychainSwift in Frameworks */,
 				2A63D1DB2EE8BD0C00ACCFD1 /* BridgeComponents in Frameworks */,
 			);
@@ -113,7 +131,8 @@
 			isa = PBXGroup;
 			children = (
 				2AC03BE72EE74F0800D9CEAD /* smallerworld */,
-				2ADF84602F0C10F000AE5037 /* smallerworld notification service */,
+				2ADF84602F0C10F000AE5037 /* smallerworldNotifications */,
+				2A5320482FCB622600EC8D5A /* smallerworldTests */,
 				2AC03BE62EE74F0800D9CEAD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -123,6 +142,7 @@
 			children = (
 				2AC03BE52EE74F0800D9CEAD /* smallerworld.app */,
 				2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */,
+				2A5320472FCB622600EC8D5A /* smallerworldTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -130,6 +150,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2A5320462FCB622600EC8D5A /* smallerworldTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2A53204D2FCB622600EC8D5A /* Build configuration list for PBXNativeTarget "smallerworldTests" */;
+			buildPhases = (
+				2A5320432FCB622600EC8D5A /* Sources */,
+				2A5320442FCB622600EC8D5A /* Frameworks */,
+				2A5320452FCB622600EC8D5A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2A53204C2FCB622600EC8D5A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				2A5320482FCB622600EC8D5A /* smallerworldTests */,
+			);
+			name = smallerworldTests;
+			packageProductDependencies = (
+			);
+			productName = smallerworldTests;
+			productReference = 2A5320472FCB622600EC8D5A /* smallerworldTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		2AC03BE42EE74F0800D9CEAD /* smallerworld */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2AC03BF82EE74F0A00D9CEAD /* Build configuration list for PBXNativeTarget "smallerworld" */;
@@ -142,7 +185,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				2ADF84652F0C10F000AE5037 /* PBXTargetDependency */,
+				2A4CF8AA2FCB637400652EDD /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2AC03BE72EE74F0800D9CEAD /* smallerworld */,
@@ -151,7 +194,6 @@
 			packageProductDependencies = (
 				2A63D1DA2EE8BD0C00ACCFD1 /* BridgeComponents */,
 				2ABB78382F088EB000EC2451 /* KeychainSwift */,
-				2AB26DE92F19896A00E448E4 /* HotwireNative */,
 				2ACF3E312F218B0600827B31 /* CodeScanner */,
 			);
 			productName = "smallerworld-ios";
@@ -171,7 +213,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				2ADF84602F0C10F000AE5037 /* smallerworld notification service */,
+				2ADF84602F0C10F000AE5037 /* smallerworldNotifications */,
 			);
 			name = "smallerworld notification service";
 			packageProductDependencies = (
@@ -187,9 +229,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2620;
+				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
+					2A5320462FCB622600EC8D5A = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = 2AC03BE42EE74F0800D9CEAD;
+					};
 					2AC03BE42EE74F0800D9CEAD = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
@@ -210,8 +256,8 @@
 			packageReferences = (
 				2A63D1D92EE8BD0C00ACCFD1 /* XCRemoteSwiftPackageReference "bridge-components" */,
 				2ABB78372F088EB000EC2451 /* XCRemoteSwiftPackageReference "keychain-swift" */,
-				2AB26DE82F19896A00E448E4 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */,
 				2ACF3E302F218B0600827B31 /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				2A99812D2FCF0E5500CD9594 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2AC03BE62EE74F0800D9CEAD /* Products */;
@@ -220,11 +266,19 @@
 			targets = (
 				2AC03BE42EE74F0800D9CEAD /* smallerworld */,
 				2ADF845E2F0C10F000AE5037 /* smallerworld notification service */,
+				2A5320462FCB622600EC8D5A /* smallerworldTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2A5320452FCB622600EC8D5A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2AC03BE32EE74F0800D9CEAD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -242,6 +296,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2A5320432FCB622600EC8D5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2AC03BE12EE74F0800D9CEAD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -259,19 +320,69 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		2ADF84652F0C10F000AE5037 /* PBXTargetDependency */ = {
+		2A4CF8AA2FCB637400652EDD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 2ADF845E2F0C10F000AE5037 /* smallerworld notification service */;
-			targetProxy = 2ADF84642F0C10F000AE5037 /* PBXContainerItemProxy */;
+			targetProxy = 2A4CF8A92FCB637400652EDD /* PBXContainerItemProxy */;
+		};
+		2A53204C2FCB622600EC8D5A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2AC03BE42EE74F0800D9CEAD /* smallerworld */;
+			targetProxy = 2A53204B2FCB622600EC8D5A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		2A53204E2FCB622600EC8D5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8CGNLEGE5T;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = smallerworld.smallerworldTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/smallerworld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/smallerworld";
+			};
+			name = Debug;
+		};
+		2A53204F2FCB622600EC8D5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8CGNLEGE5T;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = smallerworld.smallerworldTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/smallerworld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/smallerworld";
+			};
+			name = Release;
+		};
 		2AC03BF92EE74F0A00D9CEAD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 21;
@@ -280,6 +391,7 @@
 				INFOPLIST_FILE = smallerworld/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smaller world";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR codes to open links.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -312,6 +424,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 21;
@@ -320,6 +433,7 @@
 				INFOPLIST_FILE = smallerworld/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smaller world";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR codes to open links.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -477,7 +591,7 @@
 				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "smallerworld notification service/Info.plist";
+				INFOPLIST_FILE = smallerworldNotifications/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smallerworld notification service";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -491,6 +605,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -506,7 +623,7 @@
 				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "smallerworld notification service/Info.plist";
+				INFOPLIST_FILE = smallerworldNotifications/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smallerworld notification service";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -520,6 +637,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -531,6 +651,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2A53204D2FCB622600EC8D5A /* Build configuration list for PBXNativeTarget "smallerworldTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2A53204E2FCB622600EC8D5A /* Debug */,
+				2A53204F2FCB622600EC8D5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		2AC03BE02EE74F0800D9CEAD /* Build configuration list for PBXProject "smallerworld" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -569,12 +698,12 @@
 				minimumVersion = 0.3.1;
 			};
 		};
-		2AB26DE82F19896A00E448E4 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */ = {
+		2A99812D2FCF0E5500CD9594 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/hotwired/hotwire-native-ios";
+			repositoryURL = "git@github.com:smaller-world/hotwire-native-ios.git";
 			requirement = {
-				branch = "1.3.0-beta";
-				kind = branch;
+				kind = revision;
+				revision = c84cedb8b705063185b818bed42b135f3441e8b2;
 			};
 		};
 		2ABB78372F088EB000EC2451 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
@@ -600,11 +729,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A63D1D92EE8BD0C00ACCFD1 /* XCRemoteSwiftPackageReference "bridge-components" */;
 			productName = BridgeComponents;
-		};
-		2AB26DE92F19896A00E448E4 /* HotwireNative */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2AB26DE82F19896A00E448E4 /* XCRemoteSwiftPackageReference "hotwire-native-ios" */;
-			productName = HotwireNative;
 		};
 		2ABB78382F088EB000EC2451 /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;
