@@ -17,9 +17,9 @@
     {
       "patterns": ["^/sessions/new$"],
       "properties": {
-          "context": "default",
-          "presentation": "replace_root",
-          "pull_to_refresh_enabled": true,
+        "context": "default",
+        "presentation": "replace_root",
+        "pull_to_refresh_enabled": true
       }
     },
     {

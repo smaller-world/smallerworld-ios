@@ -88,6 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var components = Bridgework.coreComponents
         components.append(NotificationPermissionComponent.self)
         components.append(NotificationTokenComponent.self)
+        components.append(PassesComponent.self)
         Hotwire.registerBridgeComponents(components)
 
         // == Path configuration
