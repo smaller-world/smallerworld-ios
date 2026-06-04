@@ -10,6 +10,7 @@ class SceneController: UIResponder {
 
     private var targetURL: URL?
     private var lastErroredURL: URL?
+    private let launchOverlay = LaunchOverlay()
     private lazy var navigator = Navigator(
         configuration: .init(
             name: "main",
@@ -44,6 +45,7 @@ extension SceneController: UIWindowSceneDelegate {
         options connectionOptions: UIScene.ConnectionOptions
     ) {
         window?.rootViewController = navigator.rootViewController
+        launchOverlay.install(over: navigator.rootViewController.view)
         if let userActivity = connectionOptions.userActivities.first,
             userActivity.activityType == NSUserActivityTypeBrowsingWeb,
             let incomingURL = userActivity.webpageURL
