@@ -3,9 +3,9 @@ import KeychainSwift
 import WebKit
 import os
 
-final class InstallationID {
-    static let shared = InstallationID()
-    private let cookie_name = "installation_id"
+final class DeviceIdentifier {
+    static let shared = DeviceIdentifier()
+    private let cookie_name = "device_identifier"
 
     //  private let keychain = KeychainSwift()
 
@@ -22,15 +22,15 @@ final class InstallationID {
     }
 
     func setDefaultCookie() async {
-        let installation_id = await get()
-        log("setDefaultCookie", ["installation_id": installation_id])
+        let identifier = await get()
+        log("setDefaultCookie", ["identifier": identifier])
         let components = URLComponents(
             url: SmallerWorld.baseURL,
             resolvingAgainstBaseURL: true
         )!
         var properties: [HTTPCookiePropertyKey: Any] = [
             .name: cookie_name,
-            .value: installation_id,
+            .value: identifier,
             .domain: components.host!,
             .path: "/",  // A path of "/" makes it available to all paths on the domain
             .secure: components.scheme == "https",
@@ -47,6 +47,6 @@ final class InstallationID {
     }
 
     private func log(_ name: String, _ arguments: [String: Any] = [:]) {
-        logger.debug("[InstallationID] \(name) \(arguments)")
+        logger.debug("[DeviceIdentifier] \(name) \(arguments)")
     }
 }

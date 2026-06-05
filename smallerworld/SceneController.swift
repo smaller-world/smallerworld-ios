@@ -57,7 +57,7 @@ extension SceneController: UIWindowSceneDelegate {
             self.targetURL = targetURL
         }
         Task {
-            await InstallationID.shared.setDefaultCookie()
+            await DeviceIdentifier.shared.setDefaultCookie()
             await MainActor.run {
                 UNUserNotificationCenter.current().delegate = self
                 navigator.start()
@@ -210,6 +210,9 @@ extension SceneController: NavigatorDelegate {
 
     // Continues routing towards targetURL unless currently errored.
     func requestDidFinish(at url: URL) {
+        if launchOverlay.isInstalled {
+            launchOverlay.dismiss()
+        }
         let isLastErroredURL = lastErroredURL == url
         log(
             "requestDidFinish",

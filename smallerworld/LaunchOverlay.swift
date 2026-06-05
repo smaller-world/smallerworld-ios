@@ -31,16 +31,21 @@ final class LaunchOverlay {
         }
     }
 
-    private func dismiss() {
+    func dismiss() {
         if let observer {
             NotificationCenter.default.removeObserver(observer)
             self.observer = nil
         }
         guard let overlay = overlayView else { return }
+        overlayView = nil
         UIView.animate(
             withDuration: 0.3,
             animations: { overlay.alpha = 0 },
             completion: { _ in overlay.removeFromSuperview() }
         )
+    }
+
+    var isInstalled: Bool {
+        overlayView != nil
     }
 }

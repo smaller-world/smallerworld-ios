@@ -34,7 +34,7 @@ final class NotificationTokenComponent: BridgeComponent {
     private func handleGet() {
         // Request notification authorization
         UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .badge, .sound]
+            options: [.alert, .badge, .sound, .provisional]
         ) { granted, error in
             guard granted, error == nil else { return }
 
