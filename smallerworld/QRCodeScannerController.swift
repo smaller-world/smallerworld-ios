@@ -35,9 +35,8 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
 
     init(delegate: QRCodeScannerDelegate?) {
         super.init(nibName: nil, bundle: nil)
-
         self.delegate = delegate
-        self.title = "scan QR code"
+        self.title = "scan qr code"
     }
 
     required init?(coder: NSCoder) {
@@ -146,7 +145,7 @@ private struct ScannerOverlay: View {
                 .position(x: frameOrigin.x + frameSize / 2, y: frameOrigin.y + frameSize / 2)
                 .allowsHitTesting(false)
 
-                Text("align QR code within frame")
+                Text("align qr code within frame")
                     .font(.custom(AppFont.body, size: 14))
                     .fontWeight(.semibold)
                     .foregroundColor(Color.white.opacity(0.85))

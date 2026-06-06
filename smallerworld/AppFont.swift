@@ -1,10 +1,10 @@
 import UIKit
 
 enum AppFont {
-    static let heading = "BricolageGrotesque-96ptExtraBold_Regular"
-    static let headingMedium = "BricolageGrotesque-96ptExtraBold_Medium"
-    static let headingSemiBold = "BricolageGrotesque-96ptExtraBold_SemiBold"
-    static let headingBold = "BricolageGrotesque-96ptExtraBold_Bold"
+    static let heading = "Figtree-ExtraBold"
+    static let headingMedium = "Figtree-Medium"
+    static let headingSemiBold = "Figtree-SemiBold"
+    static let headingBold = "Figtree-Bold"
     static let body = "Manrope-Regular"
 }
 
