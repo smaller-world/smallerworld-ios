@@ -2,6 +2,7 @@ import Foundation
 import HotwireNative
 import PassKit
 import UIKit
+import os.log
 
 final class PassesComponent: BridgeComponent {
     override nonisolated class var name: String { "passes" }
@@ -20,7 +21,7 @@ final class PassesComponent: BridgeComponent {
     private func handleConnect() {
         Task { @MainActor in
             let passes = Self.loadPasses()
-            let data = ConnectMessageData( passes: passes )
+            let data = ConnectMessageData(passes: passes)
             self.reply(to: Event.connect.rawValue, with: data)
         }
     }
