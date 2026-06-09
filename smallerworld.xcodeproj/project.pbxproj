@@ -60,7 +60,7 @@
 			);
 			target = 2AC03BE42EE74F0800D9CEAD /* smallerworld */;
 		};
-		2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworldNotifications" folder in "smallerworld notification service" target */ = {
+		2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworldNotificationService" folder in "smallerworld notification service" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -91,12 +91,12 @@
 			path = smallerworld;
 			sourceTree = "<group>";
 		};
-		2ADF84602F0C10F000AE5037 /* smallerworldNotifications */ = {
+		2ADF84602F0C10F000AE5037 /* smallerworldNotificationService */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworldNotifications" folder in "smallerworld notification service" target */,
+				2ADF846A2F0C10F000AE5037 /* Exceptions for "smallerworldNotificationService" folder in "smallerworld notification service" target */,
 			);
-			path = smallerworldNotifications;
+			path = smallerworldNotificationService;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -133,7 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				2AC03BE72EE74F0800D9CEAD /* smallerworld */,
-				2ADF84602F0C10F000AE5037 /* smallerworldNotifications */,
+				2ADF84602F0C10F000AE5037 /* smallerworldNotificationService */,
 				2A5320482FCB622600EC8D5A /* smallerworldTests */,
 				2AC03BE62EE74F0800D9CEAD /* Products */,
 				2A3C31E82FD4660F003D3510 /* README.md */,
@@ -216,7 +216,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				2ADF84602F0C10F000AE5037 /* smallerworldNotifications */,
+				2ADF84602F0C10F000AE5037 /* smallerworldNotificationService */,
 			);
 			name = "smallerworld notification service";
 			packageProductDependencies = (
@@ -389,13 +389,13 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smaller world";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR codes to open links.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "scan qr codes and take pics for posts";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -407,7 +407,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = club.smallerworld.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -431,13 +431,13 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smaller world";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR codes to open links.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "scan qr codes and take pics for posts";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -449,7 +449,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = club.smallerworld.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -592,10 +592,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = smallerworldNotifications/Info.plist;
+				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smallerworld notification service";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -604,7 +604,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = club.smallerworld.ios.notificationservice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -624,10 +624,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = smallerworldNotifications/Info.plist;
+				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "smallerworld notification service";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -636,7 +636,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = club.smallerworld.ios.notificationservice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
