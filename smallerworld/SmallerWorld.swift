@@ -3,10 +3,10 @@ import Foundation
 struct SmallerWorld {
     #if DEBUG
         static let domain = "kaibook.itskai.me"
-        static let altDomain = "localhost"
+        static let altDomain = domain
     #else
         static let domain = "app.smallerworld.club"
-        static let altDomain = "app.smallerworld.club"
+        static let altDomain = "smlr.world"
     #endif
 
     static let baseURL = URL(string: "https://\(domain)")!
