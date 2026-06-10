@@ -87,32 +87,43 @@ extension SceneController: UIWindowSceneDelegate {
 
     // MARK: Helpers
 
-    /// Splits a URL's path into route segments, merging any segment whose
-    /// `"/" + name` appears in `SmallerWorld.unroutablePaths` with the segment
-    /// that follows it. `nil` and `SmallerWorld.homeURL` both return `[]`.
+    /// Splits a URL's path into route segments, merging a segment with the
+    /// one that follows it whenever the cumulative path is marked
+    /// `"unroutable": true` in the path configuration. `nil` and any URL
+    /// whose path resolves to `"presentation": "replace_root"` (e.g. `/home`,
+    /// `/session/new`) both return `[]` — these collapse to the nav root.
     ///
-    /// Examples (with unroutablePaths = ["/worlds"]):
-    /// - nil                        => []
-    /// - /home                      => []
-    /// - /worlds/asdf-12-23         => ["worlds/asdf-12-23"]
-    /// - /worlds/asdf-12-23/keys    => ["worlds/asdf-12-23", "keys"]
+    /// Examples (with `/worlds` and `/world_key_grants` marked unroutable):
+    /// - nil                            => []
+    /// - /home                          => []
+    /// - /worlds/asdf-12-23             => ["worlds/asdf-12-23"]
+    /// - /worlds/asdf-12-23/keys        => ["worlds/asdf-12-23", "keys"]
+    /// - /world_key_grants/TOKEN        => ["world_key_grants/TOKEN"]
     static func routeSegments(of url: URL?) -> [String] {
         guard let url else { return [] }
-        if url.path == SmallerWorld.homeURL.path { return [] }
+        if isRoot(url) { return [] }
         let raw = url.pathComponents.filter { $0 != "/" }
         var result: [String] = []
-        var i = 0
-        while i < raw.count {
-            let asPath = "/" + raw[i]
-            if SmallerWorld.unroutablePaths.contains(asPath), i + 1 < raw.count {
-                result.append(raw[i] + "/" + raw[i + 1])
-                i += 2
+        for component in raw {
+            if !result.isEmpty,
+                isUnroutable("/" + result.joined(separator: "/"))
+            {
+                result[result.count - 1] += "/" + component
             } else {
-                result.append(raw[i])
-                i += 1
+                result.append(component)
             }
         }
         return result
+    }
+
+    private static func isUnroutable(_ path: String) -> Bool {
+        let properties = Hotwire.config.pathConfiguration.properties(for: path)
+        return properties["unroutable"] as? Bool ?? false
+    }
+
+    private static func isRoot(_ url: URL) -> Bool {
+        let properties = Hotwire.config.pathConfiguration.properties(for: url)
+        return properties["presentation"] as? String == "replace_root"
     }
 
     /// Builds a URL with the given route segments joined into its path

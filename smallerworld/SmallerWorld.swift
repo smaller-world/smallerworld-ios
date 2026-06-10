@@ -16,11 +16,6 @@ struct SmallerWorld {
         relativeTo: baseURL
     )!
 
-    // Paths that are not directly routable on their own — when splitting a URL
-    // into route segments, a path here is merged with its following segment
-    // (e.g. "/worlds/asdf-12" becomes one segment, not two).
-    static let unroutablePaths: Set<String> = ["/worlds"]
-
     static func isAppURL(_ url: URL) -> Bool {
         return url.host == domain || url.host == altDomain && url.path != "/"
     }
