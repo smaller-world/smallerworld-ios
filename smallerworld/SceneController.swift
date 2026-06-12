@@ -19,15 +19,22 @@ class SceneController: UIResponder {
         delegate: self,
     )
 
-    private func log(_ name: String, _ arguments: [String: Any] = [:]) {
+    // MARK: Debugging
+
+    private static func trace(_ name: String, _ arguments: [String: Any] = [:]) {
         logger.debug("[SceneController] \(name) \(arguments)")
     }
+
+    private func trace(_ name: String, _ arguments: [String: Any] = [:]) {
+        Self.trace(name, arguments)
+    }
+
+    // MARK: Routing
 
     private func route(_ url: URL, options: VisitOptions? = nil) {
         if let currentURL = navigator.activeWebView.url, currentURL == url {
             return
         }
-
         navigator.route(url, options: options)
     }
 
@@ -35,6 +42,153 @@ class SceneController: UIResponder {
         let loginURL = SmallerWorld.baseURL.appendingPathComponent("/sessions/new")
         route(loginURL)
     }
+
+    /// Returns the cumulative path at each routable depth along `url`,
+    /// skipping any depth whose cumulative path is marked `"unroutable": true`
+    /// in the path configuration. `nil` and any URL whose path resolves to
+    /// `"presentation": "replace_root"` (e.g. `/home`, `/session/new`) both
+    /// return `[]` — these collapse to the nav root.
+    ///
+    /// Examples (with `/worlds` and `/world_key_grants` marked unroutable):
+    /// - nil                            => []
+    /// - /home                          => []
+    /// - /worlds/asdf-12-23             => ["/worlds/asdf-12-23"]
+    /// - /worlds/asdf-12-23/keys        => ["/worlds/asdf-12-23", "/worlds/asdf-12-23/keys"]
+    /// - /world_key_grants/TOKEN        => ["/world_key_grants/TOKEN"]
+    /// - /worlds                        => ["/worlds"] (unroutable but nowhere to escalate to)
+    static func routeSegments(of url: URL?) -> [String] {
+        guard let url else { return [] }
+        if isRootPath(url) { return [] }
+        let raw = url.pathComponents.filter { $0 != "/" }
+        var result: [String] = []
+        var current = ""
+        for component in raw {
+            current += "/" + component
+            if !isUnroutablePath(current) {
+                result.append(current)
+            }
+        }
+        // Fall back to the raw path when every depth was unroutable — callers
+        // still need something to land on.
+        if result.isEmpty, !current.isEmpty {
+            result.append(current)
+        }
+        return result
+    }
+
+    private static func isUnroutablePath(_ path: String) -> Bool {
+        let properties = Hotwire.config.pathConfiguration.properties(for: path)
+        trace("isUnroutable", ["path": path, "properties": properties])
+        return properties["unroutable"] as? Bool ?? false
+    }
+
+    private static func isRootPath(_ url: URL) -> Bool {
+        let properties = Hotwire.config.pathConfiguration.properties(for: url)
+        return properties["presentation"] as? String == "replace_root"
+    }
+
+    /// Returns the next URL to land on while routing from `from` toward `to`.
+    /// The caller decides whether to push or pop based on whether the returned
+    /// URL is already present in the navigation stack.
+    ///
+    /// Examples (with /home as root, /worlds unroutable):
+    /// - from: /worlds/jordana        to: /home                => /home
+    /// - from: /worlds/jordana        to: /worlds/freddy       => /home
+    /// - from: /worlds/jordana/keys   to: /worlds/jordana      => /worlds/jordana
+    /// - from: /home                  to: /worlds/jordana      => /worlds/jordana
+    /// - from: /worlds/freddy         to: /worlds/freddy/keys  => /worlds/freddy/keys
+    static func nextRouteURL(from: URL?, to: URL) -> URL {
+        let fromSegs = routeSegments(of: from)
+        let toSegs = routeSegments(of: to)
+
+        var prefixCount = 0
+        let maxPrefix = min(fromSegs.count, toSegs.count)
+        while prefixCount < maxPrefix && fromSegs[prefixCount] == toSegs[prefixCount] {
+            prefixCount += 1
+        }
+
+        if prefixCount == fromSegs.count {
+            // Advancing toward `to` (or already there).
+            if prefixCount == toSegs.count { return to }
+            return SmallerWorld.url(forPath: toSegs[prefixCount])
+        }
+
+        // Retreating to the deepest shared ancestor.
+        if prefixCount == 0 {
+            return SmallerWorld.homeURL
+        }
+
+        return SmallerWorld.url(forPath: toSegs[prefixCount - 1])
+    }
+
+    // Does an incremental route towards the target URL.
+    //
+    // `currentURL` overrides `navigator.activeWebView.url` when provided. Pass
+    // it in from `requestDidFinish(at:)` — `activeWebView.url` reflects the
+    // page that's currently *painted*, but `requestDidFinish` fires between
+    // Turbo's `visitRequestFinished` and `visitRendered`, so the on-screen URL
+    // lags the logical position by ~one render cycle. Reading it during that
+    // window causes us to keep re-picking the same intermediate hop and burn
+    // cancelled visits until it catches up. See docs/hotwire-native-ios.md.
+    private func routeTowardsTargetURL(currentURL overrideCurrentURL: URL? = nil) {
+        guard let targetURL else { return }
+
+        // Present SFSafariViewController if targetURL is external.
+        if !SmallerWorld.isAppURL(targetURL) {
+            let safariViewController = SFSafariViewController(url: targetURL)
+            safariViewController.dismissButtonStyle = .close
+            navigator.rootViewController.present(safariViewController, animated: true)
+            self.targetURL = nil
+            return
+        }
+
+        // Clear targetURL if it is the currently active URL.
+        let currentURL = overrideCurrentURL ?? navigator.activeWebView.url
+        if currentURL == targetURL {
+            navigator.reload()
+            self.targetURL = nil
+            return
+        }
+
+        // If `next` is already on the navigation stack, pop to it (animated) and
+        // resume routing from the completion block.
+        let nextURL = Self.nextRouteURL(from: currentURL, to: targetURL)
+        let rootVC = navigator.rootViewController
+        if let targetVC = rootVC.viewControllers.last(where: { vc in
+            guard let visitable = vc as? Visitable else { return false }
+            return visitable.currentVisitableURL.path() == nextURL.path()
+        }), targetVC !== rootVC.topViewController {
+            CATransaction.begin()
+            CATransaction.setCompletionBlock { [weak self] in
+                guard let self, let targetURL = self.targetURL else { return }
+                if nextURL == targetURL {
+                    self.targetURL = nil
+                    navigator.reload()
+                } else {
+                    routeTowardsTargetURL()
+                }
+            }
+            rootVC.popToViewController(targetVC, animated: true)
+            CATransaction.commit()
+            return
+        }
+
+        let nextPathProperties = Hotwire.config.pathConfiguration.properties(for: nextURL)
+        trace(
+            "routeTowardsTargetURL",
+            [
+                "targetURL": targetURL,
+                "currentURL": currentURL as Any,
+                "nextURL": nextURL,
+                "nextPathProperties": nextPathProperties,
+            ]
+        )
+        navigator.route(nextURL)
+        if nextURL == targetURL {
+            self.targetURL = nil
+        }
+    }
+
 }
 
 extension SceneController: UIWindowSceneDelegate {
@@ -52,9 +206,9 @@ extension SceneController: UIWindowSceneDelegate {
         {
             targetURL = rewriteURLWithCanonicalBaseURL(incomingURL)
         } else if let response = connectionOptions.notificationResponse,
-            let targetURL = notificationTargetURL(response.notification)
+            let incomingURL = notificationTargetURL(response.notification)
         {
-            self.targetURL = targetURL
+            targetURL = incomingURL
         }
         Task {
             await DeviceIdentifier.shared.setDefaultCookie()
@@ -71,11 +225,8 @@ extension SceneController: UIWindowSceneDelegate {
             return
         }
         if let incomingURL = userActivity.webpageURL {
-            let canonicalURL = rewriteURLWithCanonicalBaseURL(incomingURL)
-            targetURL = canonicalURL
-            if routeTowards(canonicalURL) {
-                targetURL = nil
-            }
+            targetURL = rewriteURLWithCanonicalBaseURL(incomingURL)
+            routeTowardsTargetURL()
         }
     }
 
@@ -85,131 +236,40 @@ extension SceneController: UIWindowSceneDelegate {
     //  func sceneWillEnterForeground(_ scene: UIScene) {}
     //  func sceneDidEnterBackground(_ scene: UIScene) {}
 
-    // MARK: Helpers
-
-    /// Splits a URL's path into route segments, merging a segment with the
-    /// one that follows it whenever the cumulative path is marked
-    /// `"unroutable": true` in the path configuration. `nil` and any URL
-    /// whose path resolves to `"presentation": "replace_root"` (e.g. `/home`,
-    /// `/session/new`) both return `[]` — these collapse to the nav root.
-    ///
-    /// Examples (with `/worlds` and `/world_key_grants` marked unroutable):
-    /// - nil                            => []
-    /// - /home                          => []
-    /// - /worlds/asdf-12-23             => ["worlds/asdf-12-23"]
-    /// - /worlds/asdf-12-23/keys        => ["worlds/asdf-12-23", "keys"]
-    /// - /world_key_grants/TOKEN        => ["world_key_grants/TOKEN"]
-    static func routeSegments(of url: URL?) -> [String] {
-        guard let url else { return [] }
-        if isRoot(url) { return [] }
-        let raw = url.pathComponents.filter { $0 != "/" }
-        var result: [String] = []
-        for component in raw {
-            if !result.isEmpty,
-                isUnroutable("/" + result.joined(separator: "/"))
-            {
-                result[result.count - 1] += "/" + component
-            } else {
-                result.append(component)
-            }
-        }
-        return result
-    }
-
-    private static func isUnroutable(_ path: String) -> Bool {
-        let properties = Hotwire.config.pathConfiguration.properties(for: path)
-        return properties["unroutable"] as? Bool ?? false
-    }
-
-    private static func isRoot(_ url: URL) -> Bool {
-        let properties = Hotwire.config.pathConfiguration.properties(for: url)
-        return properties["presentation"] as? String == "replace_root"
-    }
-
-    /// Builds a URL with the given route segments joined into its path
-    /// (relative to `SmallerWorld.baseURL`). Empty segments yield `homeURL`.
-    static func url(forRouteSegments segments: [String]) -> URL {
-        if segments.isEmpty { return SmallerWorld.homeURL }
-        let path = "/" + segments.joined(separator: "/")
-        return SmallerWorld.baseURL.appendingPathComponent(path)
-    }
-
-    /// Returns the next URL to land on while routing from `from` toward `to`.
-    /// The caller decides whether to push or pop based on whether the returned
-    /// URL is already present in the navigation stack.
-    ///
-    /// Examples (with /home as root, /worlds unroutable):
-    /// - from: /worlds/jordana        to: /home                => /home
-    /// - from: /worlds/jordana        to: /worlds/freddy       => /home
-    /// - from: /worlds/jordana/keys   to: /worlds/jordana      => /worlds/jordana
-    /// - from: /home                  to: /worlds/jordana      => /worlds/jordana
-    /// - from: /worlds/freddy         to: /worlds/freddy/keys  => /worlds/freddy/keys
-    static func nextURL(from: URL?, to: URL) -> URL {
-        let fromSegs = routeSegments(of: from)
-        let toSegs = routeSegments(of: to)
-
-        var prefixCount = 0
-        let maxPrefix = min(fromSegs.count, toSegs.count)
-        while prefixCount < maxPrefix && fromSegs[prefixCount] == toSegs[prefixCount] {
-            prefixCount += 1
-        }
-
-        if prefixCount == fromSegs.count {
-            // Advancing toward `to` (or already there).
-            if prefixCount == toSegs.count { return to }
-            return Self.url(forRouteSegments: Array(toSegs.prefix(prefixCount + 1)))
-        }
-        // Retreating to the deepest shared ancestor.
-        return Self.url(forRouteSegments: Array(toSegs.prefix(prefixCount)))
-    }
-
-    // Does an incremental route towards url, returns true if routing is complete, returns
-    // false if routing needs to be continued (via requestDidFinish, or via the CATransaction
-    // completion block after an animated pop).
-    private func routeTowards(_ url: URL) -> Bool {
-        if !SmallerWorld.isAppURL(url) {
-            let safariViewController = SFSafariViewController(url: url)
-            safariViewController.dismissButtonStyle = .close
-            navigator.rootViewController.present(safariViewController, animated: true)
-            return true
-        }
-        if let currentURL = navigator.activeWebView.url, currentURL == url {
-            return true
-        }
-
-        let next = Self.nextURL(from: navigator.activeWebView.url, to: url)
-
-        // If `next` is already on the navigation stack, pop to it (animated) and
-        // resume routing from the completion block.
-        let nav = navigator.rootViewController
-        if let targetVC = nav.viewControllers.last(where: { vc in
-            guard let visitable = vc as? Visitable else { return false }
-            return visitable.currentVisitableURL.path() == next.path()
-        }), targetVC !== nav.topViewController {
-            CATransaction.begin()
-            CATransaction.setCompletionBlock { [weak self] in
-                guard let self, let target = self.targetURL else { return }
-                if self.routeTowards(target) { self.targetURL = nil }
-            }
-            nav.popToViewController(targetVC, animated: true)
-            CATransaction.commit()
-            return false
-        }
-
-        navigator.route(next)
-        return next == url
-    }
 }
 
 extension SceneController: NavigatorDelegate {
     func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
-        log(
+        trace(
             "handle",
             [
                 "url": proposal.url.absoluteString,
                 "viewController": String(describing: proposal.viewController),
             ]
         )
+        
+        // Never let `action: replace` swap out a `replace_root` page (like
+        // /home) — that strands the user with no way back. This shows up most
+        // visibly when a modal session redirects to a default-context URL:
+        // Hotwire pops the modal then routes the redirected URL on the main
+        // session with action=replace (its default for redirected proposals),
+        // which then replaceLastViewController's /home. Re-route as .advance
+        // so the page pushes on top of /home instead.
+        // See docs/hotwire-native-ios.md.
+        if proposal.options.action == .replace,
+            let topVisitable = navigator.rootViewController.topViewController as? Visitable,
+            Self.isRootPath(topVisitable.currentVisitableURL)
+        {
+            trace(
+                "handle(overriding replace → advance to preserve root)",
+                ["url": proposal.url.absoluteString]
+            )
+            DispatchQueue.main.async {
+                navigator.route(proposal.url, options: VisitOptions(action: .advance))
+            }
+            return .reject
+        }
+        
         switch proposal.viewController {
         case QRCodeScannerController.pathConfigurationIdentifier:
             let controller = buildQRCodeScannerController()
@@ -225,7 +285,7 @@ extension SceneController: NavigatorDelegate {
             launchOverlay.dismiss()
         }
         let isLastErroredURL = lastErroredURL == url
-        log(
+        trace(
             "requestDidFinish",
             [
                 "url": url,
@@ -233,10 +293,8 @@ extension SceneController: NavigatorDelegate {
                 "isLastErroredURL": isLastErroredURL,
             ]
         )
-        if !isLastErroredURL, let targetURL {
-            if routeTowards(targetURL) {
-                self.targetURL = nil
-            }
+        if !isLastErroredURL, targetURL != nil {
+            routeTowardsTargetURL(currentURL: url)
         }
     }
 
@@ -245,27 +303,22 @@ extension SceneController: NavigatorDelegate {
         error: Error,
         retryHandler: RetryBlock?
     ) {
-        log("visitableDidFailRequest", ["error": error])
-        if let turboError = error as? TurboError, case .http(let statusCode) = turboError,
-            statusCode == 401
-        {
-            logger.debug("Got 401 status code; prompting for authentication...")
-            promptForAuthentication()
-        } else if let errorPresenter = visitable as? ErrorPresenter {
+        trace("visitableDidFailRequest", ["error": error])
+        // if let turboError = error as? TurboError, case .http(let statusCode) = turboError,
+        //     statusCode == 401
+        // {
+        //     logger.debug("Got 401 status code; prompting for authentication...")
+        //     promptForAuthentication()
+        // } else if let errorPresenter = visitable as? ErrorPresenter {
+        //     lastErroredURL = visitable.currentVisitableURL
+        //     errorPresenter.presentError(error, retryHandler: retryHandler)
+        // }
+        if let errorPresenter = visitable as? ErrorPresenter {
             lastErroredURL = visitable.currentVisitableURL
             errorPresenter.presentError(error, retryHandler: retryHandler)
         }
     }
-    
-//    func formSubmissionDidFinish(at url: URL) {
-//        log("formSubmissionDidFinish", ["url": url])
-//        for vc in navigator.rootViewController.viewControllers {
-//            if vc != self, let webViewController = vc as? WebViewController {
-//                webViewController.markContentAsStale()
-//            }
-//        }
-//    }
-//
+
     // MARK: Helpers
 
     private func buildQRCodeScannerController() -> QRCodeScannerController {
@@ -291,15 +344,9 @@ extension SceneController: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        // Guard against crash when notification is received before tabs are loaded
-        // guard HotwireTab.all.indices.contains(tabBarController.selectedIndex) else {
-        //     return
-        // }
         if let targetURL = notificationTargetURL(response.notification) {
             self.targetURL = targetURL
-            if routeTowards(targetURL) {
-                self.targetURL = nil
-            }
+            routeTowardsTargetURL()
         }
         completionHandler()
     }
@@ -322,22 +369,27 @@ extension SceneController: QRCodeScannerDelegate {
     ) {
         let trimmedResult = result.string.trimmingCharacters(in: .whitespacesAndNewlines)
         guard
-            let url = URL(
-                string: trimmedResult,
-                relativeTo: SmallerWorld.baseURL
-            )
+            let url = URL(string: trimmedResult, relativeTo: SmallerWorld.baseURL)
         else {
             return
         }
         let canonicalURL = rewriteURLWithCanonicalBaseURL(url)
-        route(canonicalURL)
+        targetURL = canonicalURL
+        trace("qrCodeScanner(didScanQRCodeWithResult)", ["targetURL": canonicalURL])
+        
+        // Routing before the modal is gone makes `activeWebView` resolve to
+        // `modalSession.webView`, which retains the URL of whatever the last
+        // modal navigated to. See docs/hotwire-native-ios.md.
+        controller.dismiss(animated: true) { [weak self] in
+            self?.routeTowardsTargetURL()
+        }
     }
 
     func qrCodeScanner(
         _ controller: UIViewController,
         didFailWithError error: ScanError
     ) {
-        logger.error("QR scan failed: \(error.localizedDescription)")
+        trace("qrCodeScanner(didFailWithError)", ["error": error.localizedDescription])
         controller.dismiss(animated: true)
     }
 

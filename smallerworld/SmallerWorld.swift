@@ -15,6 +15,10 @@ struct SmallerWorld {
         string: "/path_configurations/ios_v1.json",
         relativeTo: baseURL
     )!
+    
+    static func url(forPath path: String) -> URL {
+        baseURL.appendingPathComponent(path)
+    }
 
     static func isAppURL(_ url: URL) -> Bool {
         return url.host == domain || url.host == altDomain && url.path != "/"

@@ -48,6 +48,8 @@
 /* Begin PBXFileReference section */
 		2A3C31E82FD4660F003D3510 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		2A5320472FCB622600EC8D5A /* smallerworldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = smallerworldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A8CEA992FDC751E00240EAF /* cold-start-notification-crash.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "cold-start-notification-crash.md"; sourceTree = "<group>"; };
+		2A8CEA9A2FDC751E00240EAF /* hotwire-native-ios.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "hotwire-native-ios.md"; sourceTree = "<group>"; };
 		2AC03BE52EE74F0800D9CEAD /* smallerworld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = smallerworld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2ADF845F2F0C10F000AE5037 /* smallerworld notification service.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "smallerworld notification service.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -129,9 +131,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2A8CEA9B2FDC751E00240EAF /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				2A8CEA992FDC751E00240EAF /* cold-start-notification-crash.md */,
+				2A8CEA9A2FDC751E00240EAF /* hotwire-native-ios.md */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
 		2AC03BDC2EE74F0800D9CEAD = {
 			isa = PBXGroup;
 			children = (
+				2A8CEA9B2FDC751E00240EAF /* docs */,
 				2AC03BE72EE74F0800D9CEAD /* smallerworld */,
 				2ADF84602F0C10F000AE5037 /* smallerworldNotificationService */,
 				2A5320482FCB622600EC8D5A /* smallerworldTests */,
@@ -387,9 +399,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
+				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworldDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
@@ -431,7 +443,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
@@ -592,7 +604,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
@@ -624,7 +636,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
