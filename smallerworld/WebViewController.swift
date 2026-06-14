@@ -6,12 +6,12 @@ import os
 class WebViewController: HotwireWebViewController {
     private let modalTopDecoration = ModalTopDecorationView()
     private var previousInteractiveContentPopGestureEnabled: Bool?
-//    private var isShowingStaleContent = false
-//    
-//    public func markContentAsStale() {
-//        isShowingStaleContent = true
-//    }
-    
+    //    private var isShowingStaleContent = false
+    //
+    //    public func markContentAsStale() {
+    //        isShowingStaleContent = true
+    //    }
+
     // MARK: ViewController
 
     open override func viewDidLoad() {
@@ -23,10 +23,12 @@ class WebViewController: HotwireWebViewController {
             addModalTopDecoration()
         }
     }
-    
+
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if !hasTitle, let controller = navigationController,
+        if presentingViewController == nil,
+            !hasTitle,
+            let controller = navigationController,
             controller.viewControllers.count == 1
         {
             controller.setNavigationBarHidden(true, animated: animated)
@@ -37,14 +39,17 @@ class WebViewController: HotwireWebViewController {
             previousInteractiveContentPopGestureEnabled = recognizer.isEnabled
             recognizer.isEnabled = interactiveContentPopGestureEnabled
         }
-//        if isShowingStaleContent {
-//            visitableDelegate?.visitableDidRequestReload(self)
-//            isShowingStaleContent = false
-//        }
+        //        if isShowingStaleContent {
+        //            visitableDelegate?.visitableDidRequestReload(self)
+        //            isShowingStaleContent = false
+        //        }
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
-        if let controller = navigationController, controller.isNavigationBarHidden {
+        if presentingViewController == nil,
+            let controller = navigationController,
+            controller.isNavigationBarHidden
+        {
             controller.setNavigationBarHidden(false, animated: animated)
         }
         if #available(iOS 26.0, *),

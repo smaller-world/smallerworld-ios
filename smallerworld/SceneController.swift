@@ -78,8 +78,9 @@ class SceneController: UIResponder {
 
     private static func isUnroutablePath(_ path: String) -> Bool {
         let properties = Hotwire.config.pathConfiguration.properties(for: path)
-        trace("isUnroutable", ["path": path, "properties": properties])
-        return properties["unroutable"] as? Bool ?? false
+        let unroutable = properties["unroutable"] as? Bool ?? false
+        trace("isUnroutable", ["path": path, "unroutable": unroutable])
+        return unroutable
     }
 
     private static func isRootPath(_ url: URL) -> Bool {
@@ -240,14 +241,7 @@ extension SceneController: UIWindowSceneDelegate {
 
 extension SceneController: NavigatorDelegate {
     func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
-        trace(
-            "handle",
-            [
-                "url": proposal.url.absoluteString,
-                "viewController": String(describing: proposal.viewController),
-            ]
-        )
-        
+
         // Never let `action: replace` swap out a `replace_root` page (like
         // /home) — that strands the user with no way back. This shows up most
         // visibly when a modal session redirects to a default-context URL:
@@ -272,9 +266,23 @@ extension SceneController: NavigatorDelegate {
         
         switch proposal.viewController {
         case QRCodeScannerController.pathConfigurationIdentifier:
+            trace(
+                "handle",
+                [
+                    "url": proposal.url.absoluteString,
+                    "viewController": String(describing: proposal.viewController),
+                ]
+            )
             let controller = buildQRCodeScannerController()
             return .acceptCustom(controller)
         default:
+            trace(
+                "handle",
+                [
+                    "url": proposal.url.absoluteString,
+                    "pathConfiguration": proposal.properties,
+                ]
+            )
             return .accept
         }
     }
