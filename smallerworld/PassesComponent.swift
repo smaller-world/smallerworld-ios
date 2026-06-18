@@ -21,7 +21,7 @@ final class PassesComponent: BridgeComponent {
     private func handleConnect() {
         Task { @MainActor in
             let passes = Self.loadPasses()
-            let data = ConnectMessageData(passes: passes)
+            let data = ConnectReplyData(passes: passes)
             self.reply(to: Event.connect.rawValue, with: data)
         }
     }
@@ -38,7 +38,7 @@ extension PassesComponent {
         case connect
     }
 
-    fileprivate struct ConnectMessageData: Encodable, Sendable {
+    fileprivate struct ConnectReplyData: Encodable, Sendable {
         let passes: [PassData]
     }
 

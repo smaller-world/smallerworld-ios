@@ -311,7 +311,7 @@ extension SceneController: NavigatorDelegate {
         error: Error,
         retryHandler: RetryBlock?
     ) {
-        trace("visitableDidFailRequest", ["error": error])
+        trace("visitableDidFailRequest", ["error": error, "url": visitable.currentVisitableURL])
         // if let turboError = error as? TurboError, case .http(let statusCode) = turboError,
         //     statusCode == 401
         // {
@@ -321,8 +321,8 @@ extension SceneController: NavigatorDelegate {
         //     lastErroredURL = visitable.currentVisitableURL
         //     errorPresenter.presentError(error, retryHandler: retryHandler)
         // }
+        lastErroredURL = visitable.currentVisitableURL
         if let errorPresenter = visitable as? ErrorPresenter {
-            lastErroredURL = visitable.currentVisitableURL
             errorPresenter.presentError(error, retryHandler: retryHandler)
         }
     }

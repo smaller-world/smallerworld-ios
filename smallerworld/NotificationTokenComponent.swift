@@ -21,7 +21,7 @@ final class NotificationTokenComponent: BridgeComponent {
         case .connect:
             handleConnect()
         case .get:
-            handleGet()
+            handleRequest(message: message)
         }
     }
 
@@ -31,11 +31,16 @@ final class NotificationTokenComponent: BridgeComponent {
         }
     }
 
-    private func handleGet() {
-        // Request notification authorization
-        UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .badge, .sound, .provisional]
-        ) { granted, error in
+    private func handleRequest(message: Message) {
+        guard let data: RequestMessageData = message.data() else { return }
+
+        var options: UNAuthorizationOptions = [.alert, .badge, .sound]
+        if data.provisional {
+            options.insert(.provisional)
+        }
+
+        UNUserNotificationCenter.current().requestAuthorization(options: options) {
+            granted, error in
             guard granted, error == nil else { return }
 
             DispatchQueue.main.async {
@@ -60,7 +65,7 @@ final class NotificationTokenComponent: BridgeComponent {
                 }
 
                 let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-                let data = GetMessageData(token: token)
+                let data = RequestReplyData(token: token)
                 Task { @MainActor in
                     self.reply(to: Event.get.rawValue, with: data)
                 }
@@ -75,7 +80,11 @@ extension NotificationTokenComponent {
         case get
     }
 
-    fileprivate struct GetMessageData: Encodable, Sendable {
+    fileprivate struct RequestMessageData: Decodable {
+        let provisional: Bool
+    }
+
+    fileprivate struct RequestReplyData: Encodable, Sendable {
         let token: String
     }
 }

@@ -23,7 +23,7 @@ final class NotificationPermissionComponent: BridgeComponent {
             guard let self else { return }
 
             let permission = mapAuthorizationStatus(settings.authorizationStatus)
-            let data = ConnectMessageData(permission: permission)
+            let data = ConnectReplyData(permission: permission)
             Task { @MainActor in
                 self.reply(to: Event.connect.rawValue, with: data)
             }
@@ -37,12 +37,13 @@ extension NotificationPermissionComponent {
     }
 
     fileprivate enum NotificationPermission: String, Encodable, Sendable {
-        case granted
+        case authorized
+        case provisional
         case denied
         case indeterminate
     }
 
-    fileprivate struct ConnectMessageData: Encodable, Sendable {
+    fileprivate struct ConnectReplyData: Encodable, Sendable {
         let permission: NotificationPermission
     }
 
@@ -51,10 +52,12 @@ extension NotificationPermissionComponent {
     ) -> NotificationPermission {
         switch status {
         case .authorized:
-            return .granted
+            return .authorized
+        case .provisional, .ephemeral:
+            return .provisional
         case .denied:
             return .denied
-        case .notDetermined, .provisional, .ephemeral:
+        case .notDetermined:
             return .indeterminate
         @unknown default:
             return .indeterminate
