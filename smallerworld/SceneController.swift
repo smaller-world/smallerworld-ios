@@ -184,7 +184,17 @@ class SceneController: UIResponder {
                 "nextPathProperties": nextPathProperties,
             ]
         )
-        navigator.route(nextURL)
+        // When `nextURL` differs from the current page only by query/fragment
+        // (same path), replace the current view controller's content in place
+        // instead of pushing a duplicate. `nextRouteURL` only returns a
+        // same-path URL in its equal-segments branch, so this is exactly the
+        // query-only-change case — normal forward/back hops return a different
+        // path and fall through to the default advancing route below.
+        if let currentURL, nextURL.path() == currentURL.path() {
+            navigator.route(nextURL, options: VisitOptions(action: .replace))
+        } else {
+            navigator.route(nextURL)
+        }
         if nextURL == targetURL {
             self.targetURL = nil
         }

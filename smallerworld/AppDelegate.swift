@@ -88,6 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         components.append(NotificationPermissionComponent.self)
         components.append(NotificationTokenComponent.self)
         components.append(PassesComponent.self)
+        components.append(PassComponent.self)
         components.append(PageLoadComponent.self)
         Hotwire.registerBridgeComponents(components)
 
