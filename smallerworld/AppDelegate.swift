@@ -69,6 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func configureHotwire() {
+        Hotwire.config.applicationUserAgentPrefix = SmallerWorld.userAgentPrefix
         Hotwire.config.defaultViewController = { url in
             WebViewController(url: url)
         }

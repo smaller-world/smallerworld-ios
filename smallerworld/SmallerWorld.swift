@@ -15,6 +15,11 @@ struct SmallerWorld {
         string: "/path_configurations/ios_v1.json",
         relativeTo: baseURL
     )!
+    static let userAgentPrefix: String = {
+        ProcessInfo.processInfo.isiOSAppOnMac
+            ? "SmallerWorldIosAppOnMac"
+            : "SmallerWorldIos"
+    }()
     
     static func url(forPath path: String) -> URL {
         baseURL.appendingPathComponent(path)

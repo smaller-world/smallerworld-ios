@@ -20,12 +20,17 @@ class WebViewController: HotwireWebViewController {
         styleBackground()
         if presentingViewController != nil {
             addModalCloseButton()
-            addModalTopDecoration()
+            if modalPresentationStyle == .automatic {
+                addModalTopDecoration()
+            }
         }
     }
 
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if presentingViewController != nil {
+            installBackdropDim()
+        }
         if presentingViewController == nil,
             !hasTitle,
             let controller = navigationController,
@@ -46,6 +51,9 @@ class WebViewController: HotwireWebViewController {
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
+        if presentingViewController != nil {
+            removeBackdropDim()
+        }
         if presentingViewController == nil,
             let controller = navigationController,
             controller.isNavigationBarHidden
@@ -93,6 +101,62 @@ class WebViewController: HotwireWebViewController {
                 equalTo: view.safeAreaLayoutGuide.topAnchor
             ),
         ])
+    }
+
+    // MARK: iPad backdrop dimming
+
+    private let backdropDimView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        view.alpha = 0
+        return view
+    }()
+
+    private var shouldDimPresentingContent: Bool {
+        // The system draws its own sheet scrim on real iPads, but not when the
+        // iPad app runs on macOS — fill that gap there only.
+        traitCollection.userInterfaceIdiom == .pad && ProcessInfo.processInfo.isiOSAppOnMac
+    }
+
+    private func installBackdropDim() {
+        guard shouldDimPresentingContent,
+            let container = presentingViewController?.view,
+            backdropDimView.superview == nil
+        else { return }
+
+        container.addSubview(backdropDimView)
+        NSLayoutConstraint.activate([
+            backdropDimView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            backdropDimView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            backdropDimView.topAnchor.constraint(equalTo: container.topAnchor),
+            backdropDimView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+        ])
+
+        if let coordinator = transitionCoordinator {
+            coordinator.animate(alongsideTransition: { _ in
+                self.backdropDimView.alpha = 1
+            })
+        } else {
+            backdropDimView.alpha = 1
+        }
+    }
+
+    private func removeBackdropDim() {
+        guard backdropDimView.superview != nil else { return }
+        if let coordinator = transitionCoordinator {
+            coordinator.animate(
+                alongsideTransition: { _ in
+                    self.backdropDimView.alpha = 0
+                },
+                completion: { _ in
+                    self.backdropDimView.removeFromSuperview()
+                }
+            )
+        } else {
+            backdropDimView.alpha = 0
+            backdropDimView.removeFromSuperview()
+        }
     }
 
     private func addModalCloseButton() {
