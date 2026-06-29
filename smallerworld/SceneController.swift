@@ -273,7 +273,7 @@ extension SceneController: NavigatorDelegate {
             }
             return .reject
         }
-        
+
         switch proposal.viewController {
         case QRCodeScannerController.pathConfigurationIdentifier:
             trace(
@@ -394,7 +394,7 @@ extension SceneController: QRCodeScannerDelegate {
         let canonicalURL = rewriteURLWithCanonicalBaseURL(url)
         targetURL = canonicalURL
         trace("qrCodeScanner(didScanQRCodeWithResult)", ["targetURL": canonicalURL])
-        
+
         // Routing before the modal is gone makes `activeWebView` resolve to
         // `modalSession.webView`, which retains the URL of whatever the last
         // modal navigated to. See docs/hotwire-native-ios.md.

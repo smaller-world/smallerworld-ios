@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(
         _ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        logger.error("Failed to register for remote notifications: \(error)")
+        logger.error("Failed to register for remote notifications: \(error, privacy: .public)")
     }
 
     // MARK: UISceneSession Lifecycle

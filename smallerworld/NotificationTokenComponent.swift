@@ -2,6 +2,7 @@ import Foundation
 import HotwireNative
 import UIKit
 import UserNotifications
+import os
 
 extension Notification.Name {
     static let didReceiveDeviceToken = Notification.Name("didReceiveDeviceToken")
@@ -91,7 +92,6 @@ final class NotificationTokenComponent: BridgeComponent {
             reply(with: message.replacing(data: data))
         }
     }
-
 }
 
 extension NotificationTokenComponent {
