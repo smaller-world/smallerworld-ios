@@ -29,7 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        NotificationCenter.default.post(name: .didReceiveDeviceToken, object: deviceToken)
+        let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        NotificationCenter.default.post(name: .didReceiveDeviceToken, object: tokenString)
     }
 
     func application(
