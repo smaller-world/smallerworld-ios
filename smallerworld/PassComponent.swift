@@ -20,20 +20,18 @@ final class PassComponent: BridgeComponent {
     private func handleOpen(message: Message) {
         guard let data: OpenMessageData = message.data() else { return }
 
-        Task { @MainActor in
-            let library = PKPassLibrary()
-            guard
-                let pass = library.pass(
-                    withPassTypeIdentifier: data.passTypeIdentifier,
-                    serialNumber: data.serialNumber
-                ),
-                let url = pass.passURL
-            else {
-                return
-            }
-
-            UIApplication.shared.open(url)
+        let library = PKPassLibrary()
+        guard
+            let pass = library.pass(
+                withPassTypeIdentifier: data.passTypeIdentifier,
+                serialNumber: data.serialNumber
+            ),
+            let url = pass.passURL
+        else {
+            return
         }
+
+        UIApplication.shared.open(url)
     }
 }
 

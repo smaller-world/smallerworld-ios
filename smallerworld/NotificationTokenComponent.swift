@@ -71,7 +71,7 @@ final class NotificationTokenComponent: BridgeComponent {
         UNUserNotificationCenter.current().requestAuthorization(options: options) {
             [weak self] granted, error in
             guard granted, error == nil else {
-                Task { @MainActor [weak self] in
+                DispatchQueue.main.async { [weak self] in
                     self?.pendingMessages.removeAll { $0.id == message.id }
                 }
                 return

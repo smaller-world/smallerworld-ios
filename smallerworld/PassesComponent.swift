@@ -19,11 +19,9 @@ final class PassesComponent: BridgeComponent {
     }
 
     private func handleConnect() {
-        Task { @MainActor in
-            let passes = Self.loadPasses()
-            let data = ConnectReplyData(passes: passes)
-            self.reply(to: Event.connect.rawValue, with: data)
-        }
+        let passes = Self.loadPasses()
+        let data = ConnectReplyData(passes: passes)
+        reply(to: Event.connect.rawValue, with: data)
     }
 
     @MainActor

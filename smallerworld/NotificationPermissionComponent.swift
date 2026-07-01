@@ -24,7 +24,7 @@ final class NotificationPermissionComponent: BridgeComponent {
 
             let permission = mapAuthorizationStatus(settings.authorizationStatus)
             let data = ConnectReplyData(permission: permission)
-            Task { @MainActor in
+            DispatchQueue.main.async {
                 self.reply(to: Event.connect.rawValue, with: data)
             }
         }
