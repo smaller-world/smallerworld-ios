@@ -19,7 +19,7 @@ class WebViewController: HotwireWebViewController {
 
         styleBackground()
         if presentingViewController != nil {
-            addModalCloseButton()
+            addModalCloseOrBackButton()
             if modalPresentationStyle == .automatic {
                 addModalTopDecoration()
             }
@@ -159,14 +159,24 @@ class WebViewController: HotwireWebViewController {
         }
     }
 
-    private func addModalCloseButton() {
-        let action = UIAction { [unowned self] _ in
-            dismiss(animated: true)
+    private func addModalCloseOrBackButton() {
+        if let controller = navigationController, controller.viewControllers.count > 1 {
+            let action = UIAction { [unowned self] _ in
+                navigationController?.popViewController(animated: true)
+            }
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: "chevron.backward"),
+                primaryAction: action
+            )
+        } else {
+            let action = UIAction { [unowned self] _ in
+                dismiss(animated: true)
+            }
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                systemItem: .close,
+                primaryAction: action
+            )
         }
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            systemItem: .close,
-            primaryAction: action
-        )
     }
 
     private var interactiveContentPopGestureEnabled: Bool {
