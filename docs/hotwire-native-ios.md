@@ -47,6 +47,31 @@ Path properties drive the routing decisions HotwireNative makes for each visit p
 | `interactive_content_pop_gesture_enabled: false` | Disables iOS swipe-back gesture on the visitable. **Nothing to do with routing decisions** — purely a VC gesture flag. Don't confuse with `unroutable`. |
 | `unroutable: true` | App-specific marker (we set this, not HotwireNative). Read in `SceneController.routeSegments` to skip a depth during incremental routing. |
 | `view_controller: "..."` | Identifier the `NavigatorDelegate.handle` switch matches against to return a custom VC via `acceptCustom`. |
+| `query_string_presentation: "replace"` | Makes same-path visits that differ only by query string **replace in place** instead of pushing. Required on any page that uses query params as a filter (e.g. `/worlds/{key}?post_type_id=…`). See below. |
+
+### `query_string_presentation` and filter query params
+
+`NavigationHierarchyController.pushOrReplace` decides push-vs-replace, and its first check is `visitingSamePage`, which calls `URL.isSameLocation(as:pathProperties:)` on the current top VC's **`initialVisitableURL`**:
+
+```swift
+func isSameLocation(as url: URL, pathProperties: PathProperties) -> Bool {
+    switch pathProperties.queryStringPresentation {
+    case .replace: return path == url.path                       // query ignored
+    case .default: return path == url.path && query == url.query // query compared
+    }
+}
+```
+
+Default is `.default`, so query strings are compared. Two traps stack up:
+
+1. It compares `initialVisitableURL` — the URL the VC was **created** with — not the currently displayed URL. A filter query applied client-side after load (e.g. selecting a post type) never updates `initialVisitableURL`, so it won't match a later visit carrying that query.
+2. When a **modal redirects to a default-context page** (form submit → 302 back to the world page), Hotwire sets a modal-context-replacement flag; if `visitingSamePage` is false it falls through to `pushViewController`.
+
+Together: submitting a modal that redirects back to `/worlds/{key}?post_type_id=X` **pushes a duplicate** world page instead of reloading the one already on the stack, because the query didn't match `initialVisitableURL`.
+
+Fix: set `query_string_presentation: "replace"` on filter-query pages. `isSameLocation` then compares path only → `visitingSamePage` is true → `replaceLastViewController` fires first (before the push branch), replacing in place. This is exactly the use case the `QueryStringPresentation.replace` enum documents ("query strings as a way to filter results … without adding onto the backstack"). Any other page that filters via query params needs the same property.
+
+This applies to **both stacks**: `pushOrReplace` runs the same `visitingSamePage` check whether it's operating on `navigationController` (main) or `modalNavigationController` (modal). The modal case: on `/posts/new`, changing the post type applies `?post_type_id=…` client-side (so the new-post VC's `initialVisitableURL` stays query-less); saving a nested `edit_post_type` modal redirects back to `/posts/new?post_type_id=…`, and without `query_string_presentation: "replace"` it pushes a duplicate `/posts/new` onto the modal stack. Set the property on `/posts/new` (and `/posts/{id}/edit`, which shares the rule).
 
 ## Visit lifecycle: `requestDidFinish` vs `visitDidComplete`
 
@@ -149,6 +174,16 @@ if proposal.options.action == .replace,
 `navigator.route(url, options:)` builds a fresh `VisitProposal` with no `response.redirected`, so `isRedirect` is false on the re-issue, no pop/re-route loop, action=advance pushes onto `/home` cleanly. The `DispatchQueue.main.async` lets the original `route(proposal)` flow unwind (handle returns `.reject`, no visit happens) before the new route fires.
 
 This is implemented in `SceneController.handle(proposal:from:)` for our app.
+
+#### Gotcha: the guard must be scoped to `context == .default`
+
+The guard inspects `navigator.rootViewController.topViewController` — the **main** nav stack. In this app the main top is always `/home` (a `replace_root` page), so `isRootPath` is effectively always true there.
+
+That's fine for a modal→**default** redirect (the case the guard exists for). But a modal→**modal** redirect — e.g. `/post_types/{id}/edit` (modal) submitting and 302ing back to `/posts/new` (also modal) — never touches the main stack. Hotwire's own `didProposeVisit` pops the originating modal and `replace`s in place, landing you back on a reloaded `/posts/new` — exactly the desired behavior.
+
+Without a `context == .default` gate, the guard reads the main stack's `/home`, mis-fires, rejects that clean `.replace`, and re-issues `.advance`. Since `/posts/new` is modal-context, the advance **pushes a duplicate onto the modal stack** instead of replacing — you get a duplicate modal view and the original gets stranded (broken back button). Gating on `proposal.context == .default` lets modal→modal redirects fall through to `.accept` untouched.
+
+Note the pop-to-matching-VC logic in `routeTowardsTargetURL` does **not** help here: it only runs when `targetURL` is set (notifications / universal links / QR scans) and only inspects/pops the main `rootViewController` — it has no modal-stack awareness. An in-app form redirect is a plain Turbo proposal handled entirely by `handle(proposal:)`.
 
 ## `requestDidFinish`'s `url` source
 

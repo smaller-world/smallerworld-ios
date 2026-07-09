@@ -152,7 +152,9 @@ class SceneController: UIResponder {
         }
 
         // If `next` is already on the navigation stack, pop to it (animated) and
-        // resume routing from the completion block.
+        // resume routing from the completion block. The match is intentionally
+        // query-insensitive — `.path()` strips query/fragment — so a controller
+        // showing `/foo?a=1` still matches a target of `/foo?a=2`.
         let nextURL = Self.nextRouteURL(from: currentURL, to: targetURL)
         let rootVC = navigator.rootViewController
         if let targetVC = rootVC.viewControllers.last(where: { vc in
@@ -162,9 +164,13 @@ class SceneController: UIResponder {
             CATransaction.begin()
             CATransaction.setCompletionBlock { [weak self] in
                 guard let self, let targetURL = self.targetURL else { return }
-                if nextURL == targetURL {
+                if nextURL.path() == targetURL.path() {
+                    // We popped to this controller by path only, ignoring query
+                    // params. Now that it's on top, replace-visit the fully
+                    // qualified targetURL so the page reflects the updated query
+                    // params — a plain reload() would refetch its stale query.
                     self.targetURL = nil
-                    navigator.reload()
+                    navigator.route(targetURL, options: VisitOptions(action: .replace))
                 } else {
                     routeTowardsTargetURL()
                 }
@@ -259,8 +265,16 @@ extension SceneController: NavigatorDelegate {
         // session with action=replace (its default for redirected proposals),
         // which then replaceLastViewController's /home. Re-route as .advance
         // so the page pushes on top of /home instead.
-        // See docs/hotwire-native-ios.md.
+        //
+        // Gate on `context == .default`: this guard inspects the *main* nav
+        // stack (`rootViewController`), whose top is always /home (a
+        // replace_root page). A modal→modal redirect stays in the modal stack
+        // and never touches the main stack, so without this gate the guard
+        // mis-fires — rejecting Hotwire's clean `.replace` and re-issuing
+        // `.advance`, which pushes a duplicate onto the modal stack instead of
+        // replacing in place. See docs/hotwire-native-ios.md.
         if proposal.options.action == .replace,
+            proposal.context == .default,
             let topVisitable = navigator.rootViewController.topViewController as? Visitable,
             Self.isRootPath(topVisitable.currentVisitableURL)
         {
