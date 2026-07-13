@@ -401,7 +401,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworldDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
@@ -443,7 +443,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
@@ -604,7 +604,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
@@ -636,7 +636,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
@@ -719,7 +719,7 @@
 			repositoryURL = "git@github.com:smaller-world/hotwire-native-ios.git";
 			requirement = {
 				kind = revision;
-				revision = c84cedb8b705063185b818bed42b135f3441e8b2;
+				revision = 8bc65fc7d2eb1c8c7532a5827d8754bb90d99f50;
 			};
 		};
 		2ABB78372F088EB000EC2451 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {

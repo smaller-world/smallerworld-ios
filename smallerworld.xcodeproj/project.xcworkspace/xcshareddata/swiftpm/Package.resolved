@@ -24,7 +24,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:smaller-world/hotwire-native-ios.git",
       "state" : {
-        "revision" : "c84cedb8b705063185b818bed42b135f3441e8b2"
+        "revision" : "8bc65fc7d2eb1c8c7532a5827d8754bb90d99f50"
       }
     },
     {

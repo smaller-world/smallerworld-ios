@@ -332,7 +332,7 @@ extension SceneController: NavigatorDelegate {
 
     func visitableDidFailRequest(
         _ visitable: Visitable,
-        error: Error,
+        error: HotwireNativeError,
         retryHandler: RetryBlock?
     ) {
         trace("visitableDidFailRequest", ["error": error, "url": visitable.currentVisitableURL])
