@@ -5,7 +5,7 @@ struct SmallerWorld {
         static let domain = "kaibook.itskai.me"
         static let altDomain = domain
     #else
-        static let domain = "app.smallerworld.club"
+        static let domain = "smallerworld.club"
         static let altDomain = "smlr.world"
     #endif
 
