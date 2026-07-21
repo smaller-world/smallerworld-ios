@@ -5,7 +5,7 @@ import UIKit
 import WebKit
 import os.log
 
-class SceneController: UIResponder {
+class SceneDelegate: UIResponder {
     var window: UIWindow?
 
     private var targetURL: URL?
@@ -22,7 +22,7 @@ class SceneController: UIResponder {
     // MARK: Debugging
 
     private static func trace(_ name: String, _ arguments: [String: Any] = [:]) {
-        logger.debug("[SceneController] \(name) \(arguments)")
+        logger.debug("[SceneDelegate] \(name) \(arguments)")
     }
 
     private func trace(_ name: String, _ arguments: [String: Any] = [:]) {
@@ -208,7 +208,7 @@ class SceneController: UIResponder {
 
 }
 
-extension SceneController: UIWindowSceneDelegate {
+extension SceneDelegate: UIWindowSceneDelegate {
     // Triggers from a cold start
     func scene(
         _ scene: UIScene,
@@ -255,7 +255,7 @@ extension SceneController: UIWindowSceneDelegate {
 
 }
 
-extension SceneController: NavigatorDelegate {
+extension SceneDelegate: NavigatorDelegate {
     func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
 
         // Never let `action: replace` swap out a `replace_root` page (like
@@ -358,7 +358,7 @@ extension SceneController: NavigatorDelegate {
     }
 }
 
-extension SceneController: UNUserNotificationCenterDelegate {
+extension SceneDelegate: UNUserNotificationCenterDelegate {
     // Show notifications even when app is in foreground
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
@@ -394,7 +394,7 @@ extension SceneController: UNUserNotificationCenterDelegate {
     }
 }
 
-extension SceneController: QRCodeScannerDelegate {
+extension SceneDelegate: QRCodeScannerDelegate {
     func qrCodeScanner(
         _ controller: UIViewController,
         didScanQRCodeWithResult result: ScanResult,

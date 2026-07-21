@@ -12,47 +12,47 @@ struct routingTests {
 
     @Test("routeSegments returns cumulative paths, skipping unroutable depths")
     func testRouteSegments() {
-        #expect(SceneController.routeSegments(of: nil) == [])
-        #expect(SceneController.routeSegments(of: Self.url("/home")) == [])
+        #expect(SceneDelegate.routeSegments(of: nil) == [])
+        #expect(SceneDelegate.routeSegments(of: Self.url("/home")) == [])
         #expect(
-            SceneController.routeSegments(of: Self.url("/worlds/asdf-12-23"))
+            SceneDelegate.routeSegments(of: Self.url("/worlds/asdf-12-23"))
                 == ["/worlds/asdf-12-23"]
         )
         #expect(
-            SceneController.routeSegments(of: Self.url("/worlds/asdf-12-23/keys"))
+            SceneDelegate.routeSegments(of: Self.url("/worlds/asdf-12-23/keys"))
                 == ["/worlds/asdf-12-23", "/worlds/asdf-12-23/keys"]
         )
         // Unroutable path with nothing routable to escalate to falls back
         // to the raw path so callers still have something to land on.
-        #expect(SceneController.routeSegments(of: Self.url("/worlds")) == ["/worlds"])
+        #expect(SceneDelegate.routeSegments(of: Self.url("/worlds")) == ["/worlds"])
         // Other unroutable prefixes from the path configuration.
         #expect(
-            SceneController.routeSegments(of: Self.url("/world_key_grants/TOKEN"))
+            SceneDelegate.routeSegments(of: Self.url("/world_key_grants/TOKEN"))
                 == ["/world_key_grants/TOKEN"]
         )
         #expect(
-            SceneController.routeSegments(of: Self.url("/world_cards/abc-123"))
+            SceneDelegate.routeSegments(of: Self.url("/world_cards/abc-123"))
                 == ["/world_cards/abc-123"]
         )
         // Trailing slash should not change the segments.
         #expect(
-            SceneController.routeSegments(of: Self.url("/worlds/asdf-12-23/"))
+            SceneDelegate.routeSegments(of: Self.url("/worlds/asdf-12-23/"))
                 == ["/worlds/asdf-12-23"]
         )
         // Query / fragment should not change the segments.
         #expect(
-            SceneController.routeSegments(
+            SceneDelegate.routeSegments(
                 of: URL(string: "/worlds/asdf-12-23?invite=xyz", relativeTo: SmallerWorld.baseURL)!
             ) == ["/worlds/asdf-12-23"]
         )
         #expect(
-            SceneController.routeSegments(
+            SceneDelegate.routeSegments(
                 of: URL(string: "/worlds/asdf-12-23#section", relativeTo: SmallerWorld.baseURL)!
             ) == ["/worlds/asdf-12-23"]
         )
         // Paths the config has no opinion on emit a cumulative path at every depth.
         #expect(
-            SceneController.routeSegments(of: Self.url("/unknown/abc-123"))
+            SceneDelegate.routeSegments(of: Self.url("/unknown/abc-123"))
                 == ["/unknown", "/unknown/abc-123"]
         )
     }
@@ -131,7 +131,7 @@ struct routingTests {
     func testNextUrl(testCase: NextURLCase) {
         let from = testCase.from.map { Self.url($0) }
         let to = Self.url(testCase.to)
-        let result = SceneController.nextRouteURL(from: from, to: to)
+        let result = SceneDelegate.nextRouteURL(from: from, to: to)
         #expect(result.path == testCase.expected)
         #expect(result.host == SmallerWorld.baseURL.host)
     }
