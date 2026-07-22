@@ -1,5 +1,5 @@
 {
-  "originHash" : "b62900ed58da7429408212c3a1867ee6ab25e670e092ae5430fad98e76ee48e4",
+  "originHash" : "2c02d67405f5f4e8e40b61d9b958f377edbf33df071afea6344087fb772b0199",
   "pins" : [
     {
       "identity" : "bridge-components",
@@ -25,15 +25,6 @@
       "location" : "git@github.com:smaller-world/hotwire-native-ios.git",
       "state" : {
         "revision" : "8bc65fc7d2eb1c8c7532a5827d8754bb90d99f50"
-      }
-    },
-    {
-      "identity" : "keychain-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/evgenyneu/keychain-swift.git",
-      "state" : {
-        "revision" : "5e1b02b6a9dac2a759a1d5dbc175c86bd192a608",
-        "version" : "24.0.0"
       }
     }
   ],

@@ -1,13 +1,10 @@
 import Foundation
-import KeychainSwift
 import WebKit
 import os
 
 final class DeviceIdentifier {
     static let shared = DeviceIdentifier()
     private let cookie_name = "device_identifier"
-
-    //  private let keychain = KeychainSwift()
 
     private init() {}
 

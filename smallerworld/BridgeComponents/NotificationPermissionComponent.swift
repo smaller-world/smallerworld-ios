@@ -22,7 +22,7 @@ final class NotificationPermissionComponent: BridgeComponent {
             [weak self] settings in
             guard let self else { return }
 
-            let permission = mapAuthorizationStatus(settings.authorizationStatus)
+            let permission = NotificationPermission(settings.authorizationStatus)
             let data = ConnectReplyData(permission: permission)
             DispatchQueue.main.async {
                 self.reply(to: Event.connect.rawValue, with: data)
@@ -36,31 +36,7 @@ extension NotificationPermissionComponent {
         case connect
     }
 
-    fileprivate enum NotificationPermission: String, Encodable, Sendable {
-        case authorized
-        case provisional
-        case denied
-        case indeterminate
-    }
-
     fileprivate struct ConnectReplyData: Encodable, Sendable {
         let permission: NotificationPermission
-    }
-
-    fileprivate nonisolated func mapAuthorizationStatus(
-        _ status: UNAuthorizationStatus
-    ) -> NotificationPermission {
-        switch status {
-        case .authorized:
-            return .authorized
-        case .provisional, .ephemeral:
-            return .provisional
-        case .denied:
-            return .denied
-        case .notDetermined:
-            return .indeterminate
-        @unknown default:
-            return .indeterminate
-        }
     }
 }

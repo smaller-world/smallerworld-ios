@@ -6,17 +6,24 @@ import os
 
 extension Notification.Name {
     static let didReceiveDeviceToken = Notification.Name("didReceiveDeviceToken")
+    static let didFailToRegisterForRemoteNotifications = Notification.Name(
+        "didFailToRegisterForRemoteNotifications"
+    )
 }
 
 final class NotificationTokenComponent: BridgeComponent {
     override nonisolated class var name: String { "notification-token" }
 
     private var tokenObserver: NSObjectProtocol?
+    private var failureObserver: NSObjectProtocol?
     private var pendingMessages: [Message] = []
 
     deinit {
         if let tokenObserver {
             NotificationCenter.default.removeObserver(tokenObserver)
+        }
+        if let failureObserver {
+            NotificationCenter.default.removeObserver(failureObserver)
         }
     }
 
@@ -34,10 +41,10 @@ final class NotificationTokenComponent: BridgeComponent {
     }
 
     private func handleConnect() {
-        // Observe device token deliveries for this component's lifetime. The
-        // token is app-wide, so a single observer fulfills every in-flight
-        // request once a token arrives. Guard against duplicate `connect`
-        // deliveries so we only ever register one observer.
+        // Observe device token deliveries and registration failures for this
+        // component's lifetime. Both outcomes are app-wide, so a single pair of
+        // observers fulfills every in-flight request once APNs responds. Guard
+        // against duplicate `connect` deliveries so we only ever register once.
         guard tokenObserver == nil else { return }
 
         tokenObserver = NotificationCenter.default.addObserver(
@@ -48,19 +55,26 @@ final class NotificationTokenComponent: BridgeComponent {
             guard let token = notification.object as? String else {
                 return
             }
+            self?.resolvePendingRequests(token: token, error: nil)
+        }
 
-            // The observer is registered on the main queue, so we're already on
-            // the main actor here.
-            MainActor.assumeIsolated {
-                self?.fulfillPendingRequests(token: token)
-            }
+        failureObserver = NotificationCenter.default.addObserver(
+            forName: .didFailToRegisterForRemoteNotifications,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            let message = notification.object as? String
+            self?.resolvePendingRequests(
+                token: nil,
+                error: message ?? "Failed to register for remote notifications"
+            )
         }
     }
 
     private func handleRequest(message: Message) {
         guard let data: RequestMessageData = message.data() else { return }
 
-        // Track this request so we can reply to it once the token arrives.
+        // Track this request so we can reply to it once APNs responds.
         pendingMessages.append(message)
 
         var options: UNAuthorizationOptions = [.alert, .badge, .sound]
@@ -70,26 +84,53 @@ final class NotificationTokenComponent: BridgeComponent {
 
         UNUserNotificationCenter.current().requestAuthorization(options: options) {
             [weak self] granted, error in
-            guard granted, error == nil else {
-                DispatchQueue.main.async { [weak self] in
-                    self?.pendingMessages.removeAll { $0.id == message.id }
-                }
+            guard let self else { return }
+
+            if let error {
+                // A genuine failure asking for authorization (rare). The user
+                // never got to answer, so fall back to the current status.
+                self.resolvePendingRequests(token: nil, error: error.localizedDescription)
                 return
             }
 
+            guard granted else {
+                // The user denied the prompt. This isn't an error on iOS
+                // (`granted == false`, `error == nil`); the denied status is
+                // reported via the `permission` field.
+                self.resolvePendingRequests(token: nil, error: nil)
+                return
+            }
+
+            // Authorization granted. Ask APNs for a token; the outcome arrives
+            // asynchronously via `.didReceiveDeviceToken` or
+            // `.didFailToRegisterForRemoteNotifications`.
             DispatchQueue.main.async {
                 UIApplication.shared.registerForRemoteNotifications()
             }
         }
     }
 
-    private func fulfillPendingRequests(token: String) {
-        let data = RequestReplyData(token: token)
-        let messages = pendingMessages
-        pendingMessages.removeAll()
-
-        for message in messages {
-            reply(with: message.replacing(data: data))
+    /// Replies to every pending request with the given token/error, tagging the
+    /// reply with the *actual* current authorization status so the web side can
+    /// tell "denied" apart from "granted but token retrieval failed".
+    private nonisolated func resolvePendingRequests(token: String?, error: String?) {
+        UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
+            let permission = NotificationPermission(settings.authorizationStatus)
+            DispatchQueue.main.async {
+                MainActor.assumeIsolated {
+                    guard let self else { return }
+                    let data = RequestReplyData(
+                        token: token,
+                        permission: permission,
+                        error: error
+                    )
+                    let messages = self.pendingMessages
+                    self.pendingMessages.removeAll()
+                    for message in messages {
+                        self.reply(with: message.replacing(data: data))
+                    }
+                }
+            }
         }
     }
 }
@@ -105,6 +146,8 @@ extension NotificationTokenComponent {
     }
 
     fileprivate struct RequestReplyData: Encodable, Sendable {
-        let token: String
+        let token: String?
+        let permission: NotificationPermission
+        let error: String?
     }
 }

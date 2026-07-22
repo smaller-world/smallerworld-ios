@@ -215,8 +215,10 @@ extension SceneDelegate: UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
-        window?.rootViewController = navigator.rootViewController
-        launchOverlay.install(over: navigator.rootViewController.view)
+        guard let window else { return }
+        window.rootViewController = navigator.rootViewController
+        launchOverlay.install(over: window)
+
         if let userActivity = connectionOptions.userActivities.first,
             userActivity.activityType == NSUserActivityTypeBrowsingWeb,
             let incomingURL = userActivity.webpageURL

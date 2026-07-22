@@ -37,6 +37,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
         logger.error("Failed to register for remote notifications: \(error, privacy: .public)")
+        NotificationCenter.default.post(
+            name: .didFailToRegisterForRemoteNotifications,
+            object: error.localizedDescription
+        )
     }
 
     // MARK: UISceneSession Lifecycle
