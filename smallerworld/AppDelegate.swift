@@ -3,12 +3,7 @@ import HotwireNative
 import UIKit
 import UserNotifications
 import WebKit
-import os.log
-
-let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier!,
-    category: "smallerworld"
-)
+import os
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -30,13 +25,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        Log.app.info(
+            "Received token for remote notifications: \(tokenString, privacy: .private(mask: .hash))"
+        )
         NotificationCenter.default.post(name: .didReceiveDeviceToken, object: tokenString)
     }
 
     func application(
         _ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        logger.error("Failed to register for remote notifications: \(error, privacy: .public)")
+        Log.app.error(
+            "Failed to register for remote notifications: \(error, privacy: .public)"
+        )
         NotificationCenter.default.post(
             name: .didFailToRegisterForRemoteNotifications,
             object: error.localizedDescription
@@ -45,26 +45,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // MARK: UISceneSession Lifecycle
 
-    func application(
-        _ application: UIApplication,
-        configurationForConnecting connectingSceneSession: UISceneSession,
-        options: UIScene.ConnectionOptions
-    ) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(
-            name: "Default Configuration",
-            sessionRole: connectingSceneSession.role
-        )
-    }
-
-    func application(
-        _ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>
-    ) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
+    //    func application(
+    //        _ application: UIApplication,
+    //        configurationForConnecting connectingSceneSession: UISceneSession,
+    //        options: UIScene.ConnectionOptions
+    //    ) -> UISceneConfiguration {
+    //        // Called when a new scene session is being created.
+    //        // Use this method to select a configuration to create the new scene with.
+    //        return UISceneConfiguration(
+    //            name: "Default Configuration",
+    //            sessionRole: connectingSceneSession.role
+    //        )
+    //    }
 
     // MARK: Helpers
 

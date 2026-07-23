@@ -1,36 +1,45 @@
 import HotwireNative
 import UIKit
 import WebKit
-import os
 
-class WebViewController: HotwireWebViewController {
+final class WebViewController: HotwireWebViewController {
     private let modalTopDecoration = ModalTopDecorationView()
     private var previousInteractiveContentPopGestureEnabled: Bool?
-    //    private var isShowingStaleContent = false
-    //
-    //    public func markContentAsStale() {
-    //        isShowingStaleContent = true
-    //    }
+
+    private var hasTitle: Bool {
+        if let title = navigationItem.title {
+            return !title.isEmpty
+        } else {
+            return false
+        }
+    }
+
+    private var interactiveContentPopGestureEnabled: Bool {
+        let properties = Hotwire.config.pathConfiguration.properties(
+            for: currentVisitableURL
+        )
+        return properties["interactive_content_pop_gesture_enabled"] as? Bool ?? true
+    }
 
     // MARK: ViewController
 
-    open override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         styleBackground()
         if presentingViewController != nil {
-            addModalCloseOrBackButton()
+            addModalBackOrCloseButton()
             if modalPresentationStyle == .automatic {
                 addModalTopDecoration()
             }
         }
     }
 
-    open override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if presentingViewController != nil {
-            installBackdropDim()
-        }
+        //        if presentingViewController != nil {
+        //            installBackdropDim()
+        //        }
         if presentingViewController == nil,
             !hasTitle,
             let controller = navigationController,
@@ -44,16 +53,12 @@ class WebViewController: HotwireWebViewController {
             previousInteractiveContentPopGestureEnabled = recognizer.isEnabled
             recognizer.isEnabled = interactiveContentPopGestureEnabled
         }
-        //        if isShowingStaleContent {
-        //            visitableDelegate?.visitableDidRequestReload(self)
-        //            isShowingStaleContent = false
-        //        }
     }
 
-    open override func viewWillDisappear(_ animated: Bool) {
-        if presentingViewController != nil {
-            removeBackdropDim()
-        }
+    override func viewWillDisappear(_ animated: Bool) {
+        //        if presentingViewController != nil {
+        //            removeBackdropDim()
+        //        }
         if presentingViewController == nil,
             let controller = navigationController,
             controller.isNavigationBarHidden
@@ -72,7 +77,7 @@ class WebViewController: HotwireWebViewController {
 
     // MARK: Visitable
 
-    override open func visitableDidRender() {
+    override func visitableDidRender() {
         super.visitableDidRender()
         if let controller = navigationController {
             controller.setNavigationBarHidden(
@@ -103,63 +108,7 @@ class WebViewController: HotwireWebViewController {
         ])
     }
 
-    // MARK: iPad backdrop dimming
-
-    private let backdropDimView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.4)
-        view.alpha = 0
-        return view
-    }()
-
-    private var shouldDimPresentingContent: Bool {
-        // The system draws its own sheet scrim on real iPads, but not when the
-        // iPad app runs on macOS — fill that gap there only.
-        traitCollection.userInterfaceIdiom == .pad && ProcessInfo.processInfo.isiOSAppOnMac
-    }
-
-    private func installBackdropDim() {
-        guard shouldDimPresentingContent,
-            let container = presentingViewController?.view,
-            backdropDimView.superview == nil
-        else { return }
-
-        container.addSubview(backdropDimView)
-        NSLayoutConstraint.activate([
-            backdropDimView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            backdropDimView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            backdropDimView.topAnchor.constraint(equalTo: container.topAnchor),
-            backdropDimView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-        ])
-
-        if let coordinator = transitionCoordinator {
-            coordinator.animate(alongsideTransition: { _ in
-                self.backdropDimView.alpha = 1
-            })
-        } else {
-            backdropDimView.alpha = 1
-        }
-    }
-
-    private func removeBackdropDim() {
-        guard backdropDimView.superview != nil else { return }
-        if let coordinator = transitionCoordinator {
-            coordinator.animate(
-                alongsideTransition: { _ in
-                    self.backdropDimView.alpha = 0
-                },
-                completion: { _ in
-                    self.backdropDimView.removeFromSuperview()
-                }
-            )
-        } else {
-            backdropDimView.alpha = 0
-            backdropDimView.removeFromSuperview()
-        }
-    }
-
-    private func addModalCloseOrBackButton() {
+    private func addModalBackOrCloseButton() {
         if let controller = navigationController, controller.viewControllers.count > 1 {
             let action = UIAction { [unowned self] _ in
                 navigationController?.popViewController(animated: true)
@@ -179,18 +128,59 @@ class WebViewController: HotwireWebViewController {
         }
     }
 
-    private var interactiveContentPopGestureEnabled: Bool {
-        let properties = Hotwire.config.pathConfiguration.properties(
-            for: currentVisitableURL
-        )
-        return properties["interactive_content_pop_gesture_enabled"] as? Bool ?? true
-    }
+    // MARK: iPad backdrop dimming
 
-    var hasTitle: Bool {
-        if let title = navigationItem.title {
-            return !title.isEmpty
-        } else {
-            return false
-        }
-    }
+    //    private let backdropDimView: UIView = {
+    //        let view = UIView()
+    //        view.translatesAutoresizingMaskIntoConstraints = false
+    //        view.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+    //        view.alpha = 0
+    //        return view
+    //    }()
+    //
+    //    private var shouldDimPresentingContent: Bool {
+    //        // The system draws its own sheet scrim on real iPads, but not when the
+    //        // iPad app runs on macOS — fill that gap there only.
+    //        traitCollection.userInterfaceIdiom == .pad && ProcessInfo.processInfo.isiOSAppOnMac
+    //    }
+    //
+    //    private func installBackdropDim() {
+    //        guard shouldDimPresentingContent,
+    //            let container = presentingViewController?.view,
+    //            backdropDimView.superview == nil
+    //        else { return }
+    //
+    //        container.addSubview(backdropDimView)
+    //        NSLayoutConstraint.activate([
+    //            backdropDimView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+    //            backdropDimView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+    //            backdropDimView.topAnchor.constraint(equalTo: container.topAnchor),
+    //            backdropDimView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+    //        ])
+    //
+    //        if let coordinator = transitionCoordinator {
+    //            coordinator.animate(alongsideTransition: { _ in
+    //                self.backdropDimView.alpha = 1
+    //            })
+    //        } else {
+    //            backdropDimView.alpha = 1
+    //        }
+    //    }
+    //
+    //    private func removeBackdropDim() {
+    //        guard backdropDimView.superview != nil else { return }
+    //        if let coordinator = transitionCoordinator {
+    //            coordinator.animate(
+    //                alongsideTransition: { _ in
+    //                    self.backdropDimView.alpha = 0
+    //                },
+    //                completion: { _ in
+    //                    self.backdropDimView.removeFromSuperview()
+    //                }
+    //            )
+    //        } else {
+    //            backdropDimView.alpha = 0
+    //            backdropDimView.removeFromSuperview()
+    //        }
+    //    }
 }

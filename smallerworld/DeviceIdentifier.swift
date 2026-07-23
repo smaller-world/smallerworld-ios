@@ -4,7 +4,7 @@ import os
 
 final class DeviceIdentifier {
     static let shared = DeviceIdentifier()
-    private let cookie_name = "device_identifier"
+    private let cookieName = "device_identifier"
 
     private init() {}
 
@@ -20,13 +20,15 @@ final class DeviceIdentifier {
 
     func setDefaultCookie() async {
         let identifier = await get()
-        log("setDefaultCookie", ["identifier": identifier])
+        Log.app.info(
+            "Set \(self.cookieName, privacy: .public) cookie to: \(identifier, privacy: .private(mask: .hash))"
+        )
         let components = URLComponents(
             url: SmallerWorld.baseURL,
             resolvingAgainstBaseURL: true
         )!
         var properties: [HTTPCookiePropertyKey: Any] = [
-            .name: cookie_name,
+            .name: cookieName,
             .value: identifier,
             .domain: components.host!,
             .path: "/",  // A path of "/" makes it available to all paths on the domain
@@ -43,7 +45,4 @@ final class DeviceIdentifier {
         }
     }
 
-    private func log(_ name: String, _ arguments: [String: Any] = [:]) {
-        logger.debug("[DeviceIdentifier] \(name) \(arguments)")
-    }
 }

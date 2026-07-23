@@ -2,12 +2,7 @@ import Intents
 import UserNotifications
 import os
 
-private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier!,
-    category: "smallerworld"
-)
-
-class NotificationService: UNNotificationServiceExtension {
+final class NotificationService: UNNotificationServiceExtension {
     var contentHandler: ((UNNotificationContent) -> Void)?
     var content: UNMutableNotificationContent?
 
@@ -18,7 +13,9 @@ class NotificationService: UNNotificationServiceExtension {
         self.contentHandler = contentHandler
         self.content = (request.content.mutableCopy() as? UNMutableNotificationContent)
         guard let content else {
-            logger.error("Failed to create mutable content copy; delivering original")
+            Log.notifications.error(
+                "Failed to create mutable content copy; delivering original"
+            )
             contentHandler(request.content)
             return
         }
@@ -29,30 +26,37 @@ class NotificationService: UNNotificationServiceExtension {
             let iconUrlString = content.userInfo["icon_url"] as? String,
             let iconUrl = URL(string: iconUrlString, relativeTo: SmallerWorld.baseURL)
         else {
-            logger.log("No icon_url in payload; delivering standard notification")
+            Log.notifications.log(
+                "No icon_url in payload; delivering standard notification"
+            )
             contentHandler(content)
             return
         }
-        logger.log("Downloading sender icon from \(iconUrl.absoluteString, privacy: .public)")
+        Log.notifications.log(
+            "Downloading sender icon from \(iconUrl.absoluteString, privacy: .public)"
+        )
 
         // Download the sender icon
         let task = URLSession.shared.downloadTask(with: iconUrl) {
             [weak self] (location, response, error) in
             if let error {
-                logger.error(
-                    "Icon download failed: \(error.localizedDescription, privacy: .public)")
+                Log.notifications.error(
+                    "Icon download failed: \(error.localizedDescription, privacy: .public)"
+                )
             }
             if let http = response as? HTTPURLResponse {
-                logger.log("Icon download response status: \(http.statusCode, privacy: .public)")
+                Log.notifications.log(
+                    "Icon download response status: \(http.statusCode, privacy: .public)"
+                )
             }
             guard let self = self, let imageURI = location,
                 let imageData = try? Data(contentsOf: imageURI)
             else {
-                logger.error("No image data; delivering standard notification")
+                Log.notifications.error("No image data; delivering standard notification")
                 contentHandler(content)
                 return
             }
-            logger.log(
+            Log.notifications.log(
                 "Downloaded \(imageData.count, privacy: .public) bytes; applying communication intent"
             )
             self.applyCommunicationIntent(imageData: imageData)
@@ -62,7 +66,7 @@ class NotificationService: UNNotificationServiceExtension {
 
     private func applyCommunicationIntent(imageData: Data) {
         guard let content = content, let contentHandler = contentHandler else {
-            logger.error("Missing content or contentHandler in applyCommunicationIntent")
+            Log.notifications.error("Missing content or contentHandler in applyCommunicationIntent")
             return
         }
 
@@ -92,22 +96,27 @@ class NotificationService: UNNotificationServiceExtension {
         interaction.direction = .incoming
         interaction.donate { error in
             if let error {
-                logger.error(
-                    "Intent donation failed: \(error.localizedDescription, privacy: .public)")
+                Log.notifications.error(
+                    "Intent donation failed: \(error.localizedDescription, privacy: .public)"
+                )
             }
             // Wrap the notification in the Communication intent
             if let updatedContent = try? content.updating(from: intent) {
-                logger.log("Delivering communication notification with sender icon")
+                Log.notifications.log(
+                    "Delivering communication notification with sender icon"
+                )
                 contentHandler(updatedContent)
             } else {
-                logger.error("content.updating(from:) failed; delivering standard notification")
+                Log.notifications.error(
+                    "content.updating(from:) failed; delivering standard notification"
+                )
                 contentHandler(content)
             }
         }
     }
 
     override func serviceExtensionTimeWillExpire() {
-        logger.error("serviceExtensionTimeWillExpire; delivering best-effort content")
+        Log.notifications.error("serviceExtensionTimeWillExpire; delivering best-effort content")
         if let content = content, let contentHandler = contentHandler {
             contentHandler(content)
         }

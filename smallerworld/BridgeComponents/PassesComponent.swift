@@ -2,7 +2,7 @@ import Foundation
 import HotwireNative
 import PassKit
 import UIKit
-import os.log
+import os
 
 final class PassesComponent: BridgeComponent {
     override nonisolated class var name: String { "passes" }

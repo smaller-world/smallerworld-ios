@@ -26,6 +26,24 @@ struct SmallerWorld {
     }
 
     static func isAppURL(_ url: URL) -> Bool {
-        return url.host == domain || url.host == altDomain && url.path != "/"
+        return (url.host == domain || url.host == altDomain) && url.path != "/"
+    }
+
+    /// Rewrites an in-app `url` so its scheme/host match `baseURL`, preserving
+    /// path/query/fragment. External URLs pass through untouched.
+    static func canonicalURL(for url: URL) -> URL {
+        guard isAppURL(url) else { return url }
+        guard
+            var components = URLComponents(
+                url: baseURL,
+                resolvingAgainstBaseURL: true
+            )
+        else {
+            return url
+        }
+        components.path = url.path
+        components.query = url.query(percentEncoded: false)
+        components.fragment = url.fragment
+        return components.url ?? url
     }
 }

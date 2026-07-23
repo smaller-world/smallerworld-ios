@@ -22,7 +22,7 @@ final class NotificationBadgeCountComponent: BridgeComponent {
         UNUserNotificationCenter.current().setBadgeCount(0) { [weak self] error in
             if let error {
                 let description = error.localizedDescription
-                logger.error(
+                Log.notifications.error(
                     "Failed to clear badge count: \(description, privacy: .public)"
                 )
                 DispatchQueue.main.async { [weak self] in
