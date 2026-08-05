@@ -42,9 +42,12 @@ extension RouteCoordinator: NavigatorDelegate {
 
     // Continues routing towards targetURL unless currently errored.
     func requestDidFinish(at url: URL) {
-        if launchOverlay.isInstalled {
-            launchOverlay.dismiss()
-        }
+        // Deliberately does *not* dismiss the launch overlay. This fires when
+        // the Turbo visit request completes, which is before the page renders
+        // and well before the web app boots — dismissing here exposes the web
+        // app's own loading indicator, which is exactly what the overlay
+        // exists to hide. The overlay comes down on `.pageLoadComplete`
+        // instead (see LaunchOverlay).
         let isLastErroredURL = lastErroredURL == url
         if !isLastErroredURL, let targetURL {
             Log.routing.debug(
@@ -68,6 +71,9 @@ extension RouteCoordinator: NavigatorDelegate {
             "Request failed for \(currentURL.absoluteString, privacy: .public): \(error.localizedDescription, privacy: .public)"
         )
         lastErroredURL = currentURL
+        // The page will never report `.pageLoadComplete`, so drop the overlay
+        // now — otherwise the splash screen hides the error from the user.
+        launchOverlay.dismiss(reason: "request failed")
         if let errorPresenter = visitable as? ErrorPresenter {
             errorPresenter.presentError(error, retryHandler: retryHandler)
         }

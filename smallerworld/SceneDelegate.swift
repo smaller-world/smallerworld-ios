@@ -15,7 +15,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let window else { return }
         window.rootViewController = coordinator.rootViewController
-        coordinator.installLaunchOverlay(over: window)
+        coordinator.installLaunchOverlay()
         coordinator.prepareColdStart(connectionOptions)
 
         Task {

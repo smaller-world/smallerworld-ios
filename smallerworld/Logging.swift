@@ -8,5 +8,6 @@ enum Log {
 
     static let app = Logger(subsystem: subsystem, category: "app")
     static let routing = Logger(subsystem: subsystem, category: "routing")
+    static let launch = Logger(subsystem: subsystem, category: "launch")
     static let notifications = Logger(subsystem: subsystem, category: "notificationService")
 }

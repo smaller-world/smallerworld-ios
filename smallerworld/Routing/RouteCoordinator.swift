@@ -27,16 +27,21 @@ final class RouteCoordinator: NSObject {
         ),
         delegate: self,
     )
+    private lazy var containerViewController = RootContainerController(
+        content: navigator.rootViewController
+    )
 
     // MARK: Scene interface
 
-    /// The navigator's root view controller, installed as the window's root.
+    /// Installed as the window's root. Wraps the navigator's own root so that
+    /// full-screen overlays (currently just the launch screen) can sit above
+    /// the content without a second window — see `RootContainerController`.
     var rootViewController: UIViewController {
-        navigator.rootViewController
+        containerViewController
     }
 
-    func installLaunchOverlay(over window: UIWindow) {
-        launchOverlay.install(over: window)
+    func installLaunchOverlay() {
+        launchOverlay.install(in: containerViewController)
     }
 
     func start() {
