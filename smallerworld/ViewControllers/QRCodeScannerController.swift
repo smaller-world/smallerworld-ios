@@ -6,12 +6,12 @@ import UIKit
 
 protocol QRCodeScannerDelegate: AnyObject {
     func qrCodeScanner(
-        _ controller: UIViewController,
+        _ controller: QRCodeScannerController,
         didScanQRCodeWithResult result: ScanResult
     )
 
     func qrCodeScanner(
-        _ controller: UIViewController,
+        _ controller: QRCodeScannerController,
         didFailWithError error: ScanError
     )
 }
@@ -20,7 +20,8 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
     public static var pathConfigurationIdentifier: String { "qr_code_scanner" }
 
     weak var delegate: QRCodeScannerDelegate?
-    private lazy var scannerView = ScannerView { [weak self] response in
+    private let model = ScannerModel()
+    private lazy var scannerView = ScannerView(model: model) { [weak self] response in
         guard let self else {
             return
         }
@@ -49,6 +50,17 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
         styleNavigationBar()
         addCloseButtonToModals()
         addHostingController()
+    }
+
+    /// Shows a transient banner over the scanner, leaving the camera live so
+    /// the user can immediately try another code.
+    func showScanError(_ message: String) {
+        // A code held in frame is re-reported every `scanInterval`, which keeps
+        // the banner up — but it should only buzz once.
+        if !model.isShowingError {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+        }
+        model.showError(message)
     }
 
     // MARK: Helpers
@@ -81,7 +93,28 @@ class QRCodeScannerController: UIViewController, PathConfigurationIdentifiable {
     }
 }
 
+@MainActor @Observable
+private final class ScannerModel {
+    private(set) var errorMessage: String?
+    @ObservationIgnored private var dismissTask: Task<Void, Never>?
+
+    var isShowingError: Bool { errorMessage != nil }
+
+    func showError(_ message: String) {
+        dismissTask?.cancel()
+        errorMessage = message
+        dismissTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2.5))
+            guard !Task.isCancelled else {
+                return
+            }
+            self?.errorMessage = nil
+        }
+    }
+}
+
 private struct ScannerView: View {
+    let model: ScannerModel
     let completion: (Result<ScanResult, ScanError>) -> Void
     @State private var isTorchOn = false
 
@@ -98,8 +131,23 @@ private struct ScannerView: View {
                 height: scanFrameSize
             )
             ZStack {
-                CodeScannerView(codeTypes: [.qr], isTorchOn: isTorchOn, completion: completion)
-                    .ignoresSafeArea()
+                // `.continuous` keeps the camera live after a rejected code.
+                // `.oncePerCode` looks like a better fit, but it remembers
+                // rejected codes forever, so rescanning one does nothing.
+                //
+                // `requiresPhotoOutput` is off because we only read
+                // `result.string`; leaving it on captures a still for every
+                // frame a code is visible, and one capture that never delivers
+                // wedges the scanner permanently.
+                CodeScannerView(
+                    codeTypes: [.qr],
+                    scanMode: .continuous,
+                    requiresPhotoOutput: false,
+                    shouldVibrateOnSuccess: false,
+                    isTorchOn: isTorchOn,
+                    completion: completion
+                )
+                .ignoresSafeArea()
 
                 ScannerOverlay(
                     cutoutRect: cutoutRect,
@@ -107,7 +155,8 @@ private struct ScannerView: View {
                     cornerRadius: 20,
                     cornerLength: 22,
                     frameLineWidth: 6,
-                    isTorchOn: $isTorchOn
+                    isTorchOn: $isTorchOn,
+                    errorMessage: model.errorMessage
                 )
             }
         }
@@ -122,6 +171,7 @@ private struct ScannerOverlay: View {
     let cornerLength: CGFloat
     let frameLineWidth: CGFloat
     @Binding var isTorchOn: Bool
+    let errorMessage: String?
 
     var body: some View {
         GeometryReader { proxy in
@@ -155,8 +205,37 @@ private struct ScannerOverlay: View {
                 FlashlightButton(isTorchOn: $isTorchOn)
                     .position(x: size.width / 2, y: frameOrigin.y + frameSize + 44)
                     .allowsHitTesting(true)
+
+                if let errorMessage {
+                    ErrorBanner(message: errorMessage)
+                        .frame(maxWidth: size.width - 48)
+                        .position(x: size.width / 2, y: frameOrigin.y + frameSize + 116)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .allowsHitTesting(false)
+                }
             }
+            .animation(.snappy, value: errorMessage)
         }
+    }
+}
+
+private struct ErrorBanner: View {
+    let message: String
+
+    var body: some View {
+        Label {
+            Text(message)
+                .font(.custom(AppFont.body, size: 14))
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.leading)
+        } icon: {
+            Image(systemName: "exclamationmark.triangle.fill")
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial, in: .capsule)
+        .environment(\.colorScheme, .dark)
     }
 }
 

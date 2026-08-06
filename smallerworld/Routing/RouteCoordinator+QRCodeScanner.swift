@@ -4,17 +4,25 @@ import os
 
 extension RouteCoordinator: QRCodeScannerDelegate {
     func qrCodeScanner(
-        _ controller: UIViewController,
+        _ controller: QRCodeScannerController,
         didScanQRCodeWithResult result: ScanResult,
     ) {
-        let trimmedResult = result.string.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard
-            let url = URL(string: trimmedResult, relativeTo: SmallerWorld.baseURL)
-        else {
+        // The scanner stays live after a rejected code, so ignore anything it
+        // reports while it's on its way out from an accepted one.
+        guard !controller.isBeingDismissed else {
             return
         }
-        let canonicalURL = SmallerWorld.canonicalURL(for: url)
-        targetURL = canonicalURL
+
+        let trimmedResult = result.string.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard
+            let url = URL(string: trimmedResult, relativeTo: SmallerWorld.baseURL),
+            SmallerWorld.isAppURL(url)
+        else {
+            controller.showScanError("sorry, this isn't a smaller world qr code!")
+            return
+        }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        targetURL = SmallerWorld.canonicalURL(for: url)
 
         // Routing before the modal is gone makes `activeWebView` resolve to
         // `modalSession.webView`, which retains the URL of whatever the last
@@ -25,7 +33,7 @@ extension RouteCoordinator: QRCodeScannerDelegate {
     }
 
     func qrCodeScanner(
-        _ controller: UIViewController,
+        _ controller: QRCodeScannerController,
         didFailWithError error: ScanError
     ) {
         Log.app.error(

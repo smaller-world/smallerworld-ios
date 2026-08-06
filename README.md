@@ -1,3 +1,3 @@
 # smallerworld-ios
 
-smaller worlds, on your ios device!
+smaller worlds, on your iOS device!

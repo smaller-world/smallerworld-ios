@@ -13,7 +13,8 @@
         "\/edit$",
         "^\/world_key_grants\/.+$",
         "^\/world_cards\/[\\w-]+\/key_grant$",
-        "\/settings$"
+        "\/settings$",
+        "\/policies$"
       ],
       "properties": {
         "context": "modal",
@@ -35,7 +36,7 @@
       }
     },
     {
-      "patterns": ["\/posts\/new", "^\/posts\/[\\w-]+\/edit$"],
+      "patterns": ["\/posts\/new$", "^\/posts\/[\\w-]+\/edit$"],
       "properties": {
         "modal_style": "page_sheet",
         "modal_dismiss_gesture_enabled": false,
@@ -60,7 +61,7 @@
       }
     },
     {
-      "patterns": ["^\/scan_qr_code$"],
+      "patterns": ["^\/native\/scan_qr_code$"],
       "properties": {
         "view_controller": "qr_code_scanner",
         "context": "modal"

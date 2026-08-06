@@ -1,26 +1,45 @@
 import Foundation
 
-struct SmallerWorld {
-    #if DEBUG
-        static let domain = "kaibook.itskai.me"
-        static let altDomain = domain
-    #else
-        static let domain = "smallerworld.club"
-        static let altDomain = "smlr.world"
-    #endif
+enum SmallerWorld {
+    static var domain: String {
+        #if DEBUG
+            "kaibook.itskai.me"
+        #else
+            "smallerworld.club"
+        #endif
+    }
 
-    static let baseURL = URL(string: "https://\(domain)")!
-    static let homeURL = baseURL.appendingPathComponent("home")
-    static let pathConfigurationURL = URL(
-        string: "/path_configurations/ios_v1.json",
-        relativeTo: baseURL
-    )!
-    static let userAgentPrefix: String = {
+    static var altDomain: String {
+        #if DEBUG
+            domain
+        #else
+            "smlr.world"
+        #endif
+    }
+
+    static var baseURL: URL {
+        URL(string: "https://\(domain)")!
+    }
+
+    static var homeURL: URL {
+        baseURL.appendingPathComponent("home")
+    }
+
+    static var pathConfigurationURL: URL {
+        URL(
+            string: "/path_configurations/ios_v1.json",
+            relativeTo: baseURL
+        )!
+    }
+
+    static var userAgentPrefix: String {
         ProcessInfo.processInfo.isiOSAppOnMac
-            ? "SmallerWorldIosAppOnMac"
-            : "SmallerWorldIos"
-    }()
-    
+            ? "SmallerWorldIosAppOnMac;"
+            : "SmallerWorldIos;"
+    }
+
+    // MARK: Helpers
+
     static func url(forPath path: String) -> URL {
         baseURL.appendingPathComponent(path)
     }
