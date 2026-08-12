@@ -57,7 +57,7 @@ final class NotificationTokenComponent: BridgeComponent {
             }
             self?.resolvePendingRequests(token: token, error: nil)
         }
-
+        
         failureObserver = NotificationCenter.default.addObserver(
             forName: .didFailToRegisterForRemoteNotifications,
             object: nil,

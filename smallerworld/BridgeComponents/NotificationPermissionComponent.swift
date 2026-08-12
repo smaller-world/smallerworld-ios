@@ -12,20 +12,20 @@ final class NotificationPermissionComponent: BridgeComponent {
         }
 
         switch event {
-        case .connect:
-            handleConnect()
+        case .get:
+            handleGet()
         }
     }
 
-    private func handleConnect() {
+    private func handleGet() {
         UNUserNotificationCenter.current().getNotificationSettings {
             [weak self] settings in
             guard let self else { return }
 
             let permission = NotificationPermission(settings.authorizationStatus)
-            let data = ConnectReplyData(permission: permission)
+            let data = GetReplyData(permission: permission)
             DispatchQueue.main.async {
-                self.reply(to: Event.connect.rawValue, with: data)
+                self.reply(to: Event.get.rawValue, with: data)
             }
         }
     }
@@ -33,10 +33,10 @@ final class NotificationPermissionComponent: BridgeComponent {
 
 extension NotificationPermissionComponent {
     fileprivate enum Event: String {
-        case connect
+        case get
     }
 
-    fileprivate struct ConnectReplyData: Encodable, Sendable {
+    fileprivate struct GetReplyData: Encodable, Sendable {
         let permission: NotificationPermission
     }
 }

@@ -89,6 +89,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         components.append(PassComponent.self)
         components.append(PageLoadComponent.self)
         components.append(NotificationBadgeCountComponent.self)
+        components.append(AppSettingsComponent.self)
         Hotwire.registerBridgeComponents(components)
 
         // == Path configuration
