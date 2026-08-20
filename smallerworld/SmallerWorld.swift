@@ -21,8 +21,8 @@ enum SmallerWorld {
         URL(string: "https://\(domain)")!
     }
 
-    static var homeURL: URL {
-        baseURL.appendingPathComponent("home")
+    static var startURL: URL {
+        baseURL.appendingPathComponent("start")
     }
 
     static var pathConfigurationURL: URL {

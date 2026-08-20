@@ -23,7 +23,7 @@ final class RouteCoordinator: NSObject {
     private lazy var navigator = Navigator(
         configuration: .init(
             name: "main",
-            startLocation: SmallerWorld.homeURL
+            startLocation: SmallerWorld.startURL
         ),
         delegate: self,
     )
