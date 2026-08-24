@@ -24,6 +24,10 @@ enum SmallerWorld {
     static var startURL: URL {
         baseURL.appendingPathComponent("start")
     }
+    
+    static var homeURL: URL {
+        baseURL.appendingPathComponent("home")
+    }
 
     static var pathConfigurationURL: URL {
         URL(

@@ -75,7 +75,7 @@ enum RouteResolver {
 
         // Retreating to the deepest shared ancestor.
         if prefixCount == 0 {
-            return SmallerWorld.startURL
+            return SmallerWorld.homeURL
         }
 
         return SmallerWorld.url(forPath: toSegs[prefixCount - 1])

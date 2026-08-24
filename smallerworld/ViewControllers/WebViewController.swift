@@ -81,7 +81,8 @@ final class WebViewController: HotwireWebViewController {
         super.visitableDidRender()
         if let controller = navigationController {
             controller.setNavigationBarHidden(
-                !hasTitle && controller.viewControllers.count == 1,
+                presentingViewController == nil && !hasTitle
+                    && controller.viewControllers.count == 1,
                 animated: true
             )
         }

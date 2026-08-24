@@ -398,7 +398,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworldDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 57;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
@@ -440,7 +440,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = smallerworld/smallerworld.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 57;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworld/Info.plist;
@@ -601,7 +601,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 57;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
@@ -633,7 +633,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 57;
 				DEVELOPMENT_TEAM = UB3SB3746X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = smallerworldNotificationService/Info.plist;
