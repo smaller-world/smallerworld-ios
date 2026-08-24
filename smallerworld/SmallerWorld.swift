@@ -24,7 +24,7 @@ enum SmallerWorld {
     static var startURL: URL {
         baseURL.appendingPathComponent("start")
     }
-    
+
     static var homeURL: URL {
         baseURL.appendingPathComponent("home")
     }
@@ -37,9 +37,16 @@ enum SmallerWorld {
     }
 
     static var userAgentPrefix: String {
-        ProcessInfo.processInfo.isiOSAppOnMac
-            ? "SmallerWorldIosAppOnMac;"
-            : "SmallerWorldIos;"
+        var prefix = "SmallerWorldIos"
+        if let version = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String {
+            prefix += "/\(version)"
+        }
+        if ProcessInfo.processInfo.isiOSAppOnMac {
+          prefix += "(iOSAppOnMac)"
+        }
+        return "\(prefix);"
     }
 
     // MARK: Helpers
