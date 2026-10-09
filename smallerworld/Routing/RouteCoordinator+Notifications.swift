@@ -10,7 +10,7 @@ extension RouteCoordinator: UNUserNotificationCenterDelegate {
             @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         // Show banner even in foreground
-        completionHandler([.banner, .sound])
+        completionHandler([.banner, .sound, .badge])
     }
 
     // Handle notification interaction
